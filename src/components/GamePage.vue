@@ -45,14 +45,8 @@
   .cards__card {
     min-width: 0;
     min-height: 0;
-    /*max-width: 100%;*/
-    /*max-height: 100%;*/
-  }
-
-  .card__inner {
-    position: relative;
-    transition: 0.6s;
-    transform-style: preserve-3d;
+    width: 100%;
+    height: 100%;
   }
 
   .card {
@@ -63,18 +57,35 @@
     transform: rotateY(180deg);
   }
 
+  .card__inner {
+    position: relative;
+    transition: 0.6s;
+    transform-style: preserve-3d;
+    width: 100%;
+    height: 100%;
+  }
+
   .card__frontside, .card__backside {
-    max-width: 100%;
-    max-height: 100%;
+    min-width: 0;
+    min-height: 0;
+    width: 100%;
+    height: 100%;
+
+    object-fit: contain;
+    position: absolute;
+    left: 0;
+    top: 0;
+
     /* иначе <img> является строчым элементом, с vertical-align: baseline по умолчанию (https://stackoverflow.com/a/34952703/5812238) */
     display: block;
   }
 
+  .card__frontside {
+    z-index: 1;
+  }
+
   .card__backside {
     transform: rotateY(180deg);
-    position: absolute;
-    left: 0;
-    top: 0;
   }
 
   /* увеличение нажимаемой области кнопки (для удобства) */
