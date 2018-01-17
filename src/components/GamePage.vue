@@ -12,8 +12,8 @@
         <span class="scores-value" data-tid="Menu-scores">{{score}}</span>
       </div>
     </div>
-    <div class="cards" v-if="cards">
-      <div class="card cards__card" v-for="card of cards">
+    <div class="cards" ref="cards">
+      <div class="card cards__card" v-if="cards" v-for="card of cards">
         <div class="card__inner">
           <img class="card__frontside"
                :src="`/static/cards/${card}.png`"
@@ -31,13 +31,40 @@
 
 <style scoped>
   .cards {
-    width: 55vw;
-    height: 76vh;
-    margin-top: 2vh;
+    /* в макете расстояние между картами равно 3% от высоты экрана */
+    /* поэтому у меня расстояние между картами будет равно 3vmin */
+    --grid-gap: 3vmin;
+
+    /* в макете поле с картами занимает 55% высоты и 76% ширины экрана */
+    /* если зафиксировать расстояние между картами, то сделать размер поля точно как в макете не получится */
+    /* поэтому у меня поле будет занимать не более 60% высоты и не более 80% ширины (одна из границ точная) */
+    --grid-max-width: 60vw;
+    --grid-max-height: 80vh;
+
+    /* выберем высоту и ширину карты */
+    /* хотим чтобы из следующих неравенств выполнялось хотя бы одно */
+    /* ширина_карты * 6 + grid-gap * 5 <= grid-max-width  */
+    /* высота_карты * 3 + grid-gap * 2 <= grid-max-height */
+    /* и ещё чтобы карта сохраняла пропорции (карты имеют размер 226px на 314px): */
+    /* ширина_карты = 226 * card-scale */
+    /* высота_карты = 314 * card-scale */
+    /* таким образом, можем найти значение card-scale: */
+    /* card-scale <= (grid-max-width  - grid-gap * 5) / 6 / 226 */
+    /* card-scale <= (grid-max-height - grid-gap * 2) / 3 / 314 */
+    /* к сожалению, функция calc не поддерживает взятие минимума, поэтому эту переменную придётся считать в javascript */
+    /* --card-scale: <javascript> */
+
+    /* карты имеют размер 226px на 314px */
+    --card-width: calc(226px * var(--card-scale));
+    --card-height: calc(314px * var(--card-scale));
+
+    width: calc(var(--card-width) * 6 + var(--grid-gap) * 5);
+    height: calc(var(--card-height) * 3 + var(--grid-gap) * 2);
+    margin-top: 4vh;
 
     display: grid;
     grid-template: repeat(3, 1fr) / repeat(6, 1fr);
-    grid-gap: 3vmin;
+    grid-gap: var(--grid-gap);
     align-items: center;
     justify-items: center;
   }
@@ -54,6 +81,7 @@
   }
 
   .card:hover .card__inner {
+  /*.card .card__inner {*/
     transform: rotateY(180deg);
   }
 
@@ -156,18 +184,35 @@
         fieldHeight: 3,
         fieldWidth: 6,
         cards: null,
-        score: 0
-
+        score: 0,
+        console,
+        getComputedStyle
       };
     },
     mounted() {
       console.clear();
       this.startNewGame();
+      window.addEventListener('resize', this.onResize);
+      this.onResize();
     },
-    // beforeDestroy(){
-    //
-    // },
+    beforeDestroy: function () {
+      window.removeEventListener('resize', this.onResize);
+    },
     methods: {
+      onResize() {
+        let windowWidth = document.documentElement.clientWidth;
+        let windowHeight = document.documentElement.clientHeight;
+        let gridMaxWidth = 0.6 * windowWidth;
+        let gridMaxHeight = 0.8 * windowHeight;
+        let gridGap = 0.03 * Math.min(windowWidth, windowHeight);
+        let cardScale = Math.min(
+          (gridMaxWidth - gridGap * 5) / 6 / 226,
+          (gridMaxHeight - gridGap * 2) / 3 / 314
+        );
+        if (this.$refs.cards) {
+          this.$refs.cards.style.setProperty('--card-scale', cardScale);
+        }
+      },
       onButtonNewGameClick(event) {
         event.target.blur();
         this.startNewGame();
