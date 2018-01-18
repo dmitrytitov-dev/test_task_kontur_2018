@@ -6,7 +6,7 @@
       tag="button"
       to="/game"
       @click.native="$event.target.blur()"
-      class="button"
+      class="menu__button-new-game"
       data-tid="NewGame-startGame">Начать игру
     </router-link>
   </div>
@@ -43,7 +43,7 @@
     text-transform: uppercase;
   }
 
-  .button {
+  .menu__button-new-game {
     margin-top: 5.7vh;
     width: 144px;
     height: 42px;
@@ -60,12 +60,12 @@
     transition: all .1s;
   }
 
-  .button:hover {
+  .menu__button-new-game:hover {
     cursor: pointer;
     transform: scale(1.2);
   }
 
-  .button:focus {
+  .menu__button-new-game:focus {
     /* я не придумал как переопределить outline, поэтому оставил стандартную рамку */
     /* outline: none; */
   }

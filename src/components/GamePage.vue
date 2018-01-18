@@ -1,27 +1,29 @@
 <template>
-  <div class="container">
-    <div class="menu">
-      <button
-        @click="onButtonNewGameClick"
-        class="button"
-        data-tid="Menu-newGame"
-      >Начать заново
-      </button>
-      <div class="scores">
-        <span class="scores-title">Очки:</span>
-        <span class="scores-value" data-tid="Menu-scores">{{score}}</span>
-      </div>
+  <div class="game-page">
+    <div class="game-page__menu menu">
+      <button class="menu__button-new-game" data-tid="Menu-newGame" @click="onButtonNewGameClick">Начать заново</button>
+      <span class="menu__scores-title">Очки:</span>
+      <span class="menu__scores-value" data-tid="Menu-scores">{{score}}</span>
     </div>
-    <div class="cards" ref="cards">
-      <div class="card cards__card" v-if="cards" v-for="card of cards">
+    <div class="game-page__cards cards"
+         data-tid="Deck"
+         ref="cards"
+    >
+      <div :class="['cards__card card', {'card_flipped': card.flipped, 'card_visible': card.visible}]"
+           v-if="cards"
+           v-for="(card, index) of cards"
+           @click="onCardClick(index)"
+           :data-tid="card.flipped ? 'Card-flipped' : (card.visible ? 'Card' : null)"
+      >
         <div class="card__inner">
           <img class="card__frontside"
-               :src="`/static/cards/${card}.png`"
+               :src="`/static/cards/${card.name}.png`"
                alt=""
           >
           <img class="card__backside"
                :src="`/static/backside.png`"
                alt=""
+               v-if="card.visible"
           >
         </div>
       </div>
@@ -30,6 +32,58 @@
 </template>
 
 <style scoped>
+  .game-page__cards {
+    margin-top: 4vh;
+  }
+
+  /* =========== стили меню =========== */
+
+  .menu {
+    display: flex;
+  }
+
+  .menu__button-new-game, .menu__scores-title, .menu__scores-value {
+    opacity: 0.8;
+    font-size: 14px;
+    color: white;
+  }
+
+  /* увеличение нажимаемой области кнопки (для удобства) */
+  /* https://stackoverflow.com/questions/19246893/increasing-clickable-area-of-a-button */
+  .menu__button-new-game:before {
+    position: absolute;
+    content: '';
+    top: -1vh;
+    right: -1vw;
+    left: -1vw;
+    bottom: -1vh;
+  }
+
+  .menu__button-new-game {
+    position: relative; /* чтобы у .button:before работал position: absolute; */
+    padding: 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+
+    font-weight: 600; /* semi-bold */
+    letter-spacing: -0.25px;
+  }
+
+  .menu__scores-title {
+    margin-left: auto;
+    font-weight: bold;
+    letter-spacing: 0;
+  }
+
+  .menu__scores-value {
+    margin-left: 0.4vw;
+    font-family: Krungthep, monospace;
+    letter-spacing: 0;
+  }
+
+  /* =========== стили карт =========== */
+
   .cards {
     /* в макете расстояние между картами равно 3% от высоты экрана */
     /* поэтому у меня расстояние между картами будет равно 3vmin */
@@ -60,7 +114,6 @@
 
     width: calc(var(--card-width) * 6 + var(--grid-gap) * 5);
     height: calc(var(--card-height) * 3 + var(--grid-gap) * 2);
-    margin-top: 4vh;
 
     display: grid;
     grid-template: repeat(3, 1fr) / repeat(6, 1fr);
@@ -80,14 +133,18 @@
     perspective: 1000px;
   }
 
-  .card:hover .card__inner {
-  /*.card .card__inner {*/
+  .card_visible {
+    cursor: pointer;
+  }
+
+  /* https://davidwalsh.name/css-flip */
+  .card.card_flipped .card__inner {
     transform: rotateY(180deg);
   }
 
   .card__inner {
     position: relative;
-    transition: 0.6s;
+    transition: transform 0.6s;
     transform-style: preserve-3d;
     width: 100%;
     height: 100%;
@@ -98,6 +155,7 @@
     min-height: 0;
     width: 100%;
     height: 100%;
+    backface-visibility: hidden;
 
     object-fit: contain;
     position: absolute;
@@ -109,57 +167,11 @@
   }
 
   .card__frontside {
-    z-index: 1;
-  }
-
-  .card__backside {
     transform: rotateY(180deg);
   }
 
-  /* увеличение нажимаемой области кнопки (для удобства) */
-  /* https://stackoverflow.com/questions/19246893/increasing-clickable-area-of-a-button */
-  .button:before {
-    position: absolute;
-    content: '';
-    top: -1vh;
-    right: -1vw;
-    left: -1vw;
-    bottom: -1vh;
-  }
-
-  .button {
-    /* чтобы у .button:before работал position: absolute; */
-    position: relative;
-    padding: 0;
-    background: none;
-    border: none;
-    cursor: pointer;
-
-    opacity: 0.8;
-    /* semi-bold */
-    font-weight: 600;
-    font-size: 14px;
-    color: white;
-    letter-spacing: -0.25px;
-  }
-
-  .scores {
-    float: right;
-    opacity: 0.8;
-    font-size: 14px;
-    color: white;
-    letter-spacing: 0;
-    /* чтобы не было пробела между <span> title и value элементами (https://css-tricks.com/fighting-the-space-between-inline-block-elements/) */
-    display: flex;
-  }
-
-  .scores-title {
-    font-weight: bold;
-  }
-
-  .scores-value {
-    margin-left: 0.4vw;
-    font-family: Krungthep, monospace;
+  .card__backside {
+    /*z-index: 1;*/
   }
 </style>
 
@@ -181,24 +193,64 @@
     name: 'game',
     data() {
       return {
-        fieldHeight: 3,
-        fieldWidth: 6,
+        deskHeight: 3,
+        deskWidth: 6,
         cards: null,
+        firstFlippedCardIndex: null,
         score: 0,
-        console,
-        getComputedStyle
+        removeCardsFlipTimeoutId: null
       };
     },
     mounted() {
       console.clear();
       this.startNewGame();
-      window.addEventListener('resize', this.onResize);
       this.onResize();
+      window.addEventListener('resize', this.onResize);
     },
     beforeDestroy: function () {
       window.removeEventListener('resize', this.onResize);
     },
     methods: {
+      onButtonNewGameClick(event) {
+        event.target.blur();
+        this.startNewGame();
+      },
+      flipAllCards() {
+        if (this.removeCardsFlipTimeoutId) {
+          clearTimeout(this.removeCardsFlipTimeoutId);
+        }
+        const removeCardsFlip = () => {
+          for (let card of this.cards) {
+            card.flipped = false;
+          }
+          this.removeCardsFlipTimeoutId = null;
+        };
+        // const removeCardsFlipDelay = 5000;
+        const removeCardsFlipDelay = 700;
+        this.removeCardsFlipTimeoutId = setTimeout(removeCardsFlip, removeCardsFlipDelay);
+      },
+      startNewGame() {
+        const suits = ['C', 'D', 'H', 'S'];
+        const lettersFromTwoToNine = range(2, 10).map(x => x.toString());
+        const ranks = ['0', ...lettersFromTwoToNine, 'A', 'J', 'K', 'Q'];
+        const cardsAll = getAllCards(suits, ranks);
+
+        let cardsCurrentUnique = [];
+        while (cardsCurrentUnique.length < 9) {
+          // let randomIndex = Math.floor(Math.random() * cardsAll.length);
+          let randomIndex = 1;
+          let randomCard = cardsAll[randomIndex];
+          /*if (cardsCurrentUnique.indexOf(randomCard) === -1)*/
+          {
+            cardsCurrentUnique.push(randomCard);
+          }
+        }
+        let cardsNames = /*shuffle*/([...cardsCurrentUnique, ...cardsCurrentUnique]);
+        this.cards = cardsNames.map(name => {return {name, flipped: true, visible: true}; });
+        this.score = 0;
+
+        this.flipAllCards();
+      },
       onResize() {
         let windowWidth = document.documentElement.clientWidth;
         let windowHeight = document.documentElement.clientHeight;
@@ -213,25 +265,36 @@
           this.$refs.cards.style.setProperty('--card-scale', cardScale);
         }
       },
-      onButtonNewGameClick(event) {
-        event.target.blur();
-        this.startNewGame();
-      },
-      startNewGame() {
-        const suits = ['C', 'D', 'H', 'S'];
-        const lettersFromTwoToNine = range(2, 10).map(x => x.toString());
-        const ranks = ['0', ...lettersFromTwoToNine, 'A', 'J', 'K', 'Q'];
-        const cardsAll = getAllCards(suits, ranks);
-
-        let cardsCurrentUnique = [];
-        while (cardsCurrentUnique.length < 9) {
-          let randomIndex = Math.floor(Math.random() * cardsAll.length);
-          let randomCard = cardsAll[randomIndex];
-          if (cardsCurrentUnique.indexOf(randomCard) === -1) {
-            cardsCurrentUnique.push(randomCard);
-          }
+      onCardClick(cardIndex) {
+        let card = this.cards[cardIndex];
+        if (card.flipped || !card.visible) {
+          // клик по уже открытой карте или клик по уже убраной карте
+          return;
         }
-        this.cards = shuffle([...cardsCurrentUnique, ...cardsCurrentUnique]);
+        card.flipped = true;
+
+        if (this.firstFlippedCardIndex === null) {
+          // кроме текущей карты нет открытых карт
+          this.firstFlippedCardIndex = cardIndex;
+          return;
+        }
+
+        let flippedCard = this.cards[this.firstFlippedCardIndex];
+        let numberPairsOpened = this.cards.filter(card => !card.visible).length / 2;
+        let numberPairsUnopened = this.cards.length / 2 - numberPairsOpened;
+        if (card.name === flippedCard.name) {
+          this.score += numberPairsUnopened * 42;
+        } else {
+          this.score -= numberPairsOpened * 42;
+        }
+        this.firstFlippedCardIndex = null;
+
+        const flipCardPair = () => {
+          card.flipped = flippedCard.flipped = false;
+          card.visible = flippedCard.visible = false;
+        };
+        const flipCardPairDelay = 1500;
+        setTimeout(flipCardPair, flipCardPairDelay);
       }
     }
   };
