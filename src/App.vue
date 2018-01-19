@@ -30,7 +30,8 @@
     components: {ResultPage, GamePage, IntroPage},
     data() {
       return {
-        state: State.INTRO,
+        // state: State.INTRO,
+        state: State.GAME,
         score: null,
         State
       };

@@ -1,7 +1,7 @@
 <template>
-  <div class="game-page">
+  <div class="game-page" v-if="game">
     <game-page-menu class="game-page__menu"
-                    :score="score"
+                    :score="scoreDelayed"
                     :onButtonNewGameClick="onButtonNewGameClick"
                     ref="menu"
     ></game-page-menu>
@@ -9,23 +9,21 @@
          data-tid="Deck"
          ref="cards"
     >
-      <template v-if="cards" v-for="card of cards">
-        <div :class="['cards__card card', {'card_flipped': card.flipped, 'card_visible': card.visible}]"
-             @click="onCardClick(card)"
-             :data-tid="card.flipped ? 'Card-flipped' : (card.visible ? 'Card' : null)"
-        >
-          <div class="card__inner">
-            <img class="card__frontside"
-                 :src="`/static/cards/${card.name}.png`"
-                 alt=""
-            >
-            <img class="card__backside"
-                 :src="`/static/backside.png`"
-                 alt=""
-            >
-          </div>
+      <div v-for="card of game.cards" :class="['cards__card card', {'card_flipped': isCardFlipped(card), 'card_visible': card.visible}]"
+           @click="onCardClick(card)"
+           :data-tid="card.flipped ? 'Card-flipped' : (card.visible ? 'Card' : null)"
+      >
+        <div class="card__inner">
+          <img class="card__frontside"
+               :src="`/static/cards/${card.name}.png`"
+               alt=""
+          >
+          <img class="card__backside"
+               :src="`/static/backside.png`"
+               alt=""
+          >
         </div>
-      </template>
+      </div>
     </div>
   </div>
 </template>
@@ -38,6 +36,11 @@
   /* =========== стили карт =========== */
 
   .cards {
+    /* создадим css-переменные для числа строк и столбцов поля */
+    /* если мы захотим поле другого размера, то достаточно будет изменить их в JavaScript */
+    --number-rows: 3;
+    --number-columns: 6;
+
     /* в макете расстояние между картами равно 3% от высоты экрана */
     /* поэтому у меня расстояние между картами будет равно 3vmin */
     --grid-gap: 3vmin;
@@ -67,7 +70,8 @@
 
     /* поле это сетка, с расстояними между картами равным --grid-gap и известной шириной/высотой (одинаковой) каждого элемента */
     display: grid;
-    grid-template: repeat(3, var(--card-height)) / repeat(6, var(--card-width));
+    grid-template-rows: repeat(var(--number-rows), var(--card-height));
+    grid-template-columns: repeat(var(--number-columns), var(--card-width));
     grid-gap: var(--grid-gap);
   }
 
@@ -81,9 +85,9 @@
     cursor: pointer;
   }
 
-  .card:not(.card_visible) {
-    visibility: hidden;
-  }
+  /*.card:not(.card_visible) {*/
+  /*visibility: hidden;*/
+  /*}*/
 
   /* https://davidwalsh.name/css-flip */
   .card.card_flipped .card__inner {
@@ -118,19 +122,8 @@
 </style>
 
 <script>
-  import range from 'lodash.range';
-  import shuffle from 'lodash.shuffle';
   import GamePageMenu from '@/components/GamePage/GamePageMenu';
-
-  function getAllCards(suits, ranks) {
-    let cards = [];
-    for (let suit of suits) {
-      for (let rank of ranks) {
-        cards.push(rank + suit);
-      }
-    }
-    return cards;
-  }
+  import Game from './Game.js';
 
   export default {
     components: {GamePageMenu},
@@ -138,62 +131,45 @@
     props: ['moveToResultPage'],
     data() {
       return {
-        deskHeight: 3,
-        deskWidth: 6,
-        cards: null,
-        firstFlippedCard: null,
-        score: 0,
+        game: null,
+        keepFlipped: null,
+        scoreDelayed: null,
         removeCardsFlipTimeoutId: null
       };
     },
     mounted() {
       console.clear();
       this.startNewGame();
-      this.onResize();
+      this.$nextTick(() => this.onResize());
       window.addEventListener('resize', this.onResize);
     },
     beforeDestroy: function () {
       window.removeEventListener('resize', this.onResize);
     },
     methods: {
-      onButtonNewGameClick(event) {
-        event.target.blur();
-        this.startNewGame();
+      isCardFlipped(card) {
+        return card.flipped || this.keepFlipped[card.index];
       },
-      flipAllCards() {
+      flipAllCardsDelayed() {
         if (this.removeCardsFlipTimeoutId) {
           clearTimeout(this.removeCardsFlipTimeoutId);
         }
         const removeCardsFlip = () => {
-          for (let card of this.cards) {
+          for (let card of this.game.cards) {
             card.flipped = false;
           }
           this.removeCardsFlipTimeoutId = null;
         };
-        const removeCardsFlipDelay = 5000;
+        // const removeCardsFlipDelay = 5000;
+        const removeCardsFlipDelay = 2000;
         // const removeCardsFlipDelay = 700;
-        // const removeCardsFlipDelay = 2000;
         this.removeCardsFlipTimeoutId = setTimeout(removeCardsFlip, removeCardsFlipDelay);
       },
       startNewGame() {
-        const suits = ['C', 'D', 'H', 'S'];
-        const lettersFromTwoToNine = range(2, 10).map(x => x.toString());
-        const ranks = ['0', ...lettersFromTwoToNine, 'A', 'J', 'K', 'Q'];
-        const cardsAll = getAllCards(suits, ranks);
-
-        let cardsCurrentUnique = [];
-        while (cardsCurrentUnique.length < 9) {
-          let randomIndex = Math.floor(Math.random() * cardsAll.length);
-          let randomCard = cardsAll[randomIndex];
-          if (cardsCurrentUnique.indexOf(randomCard) === -1) {
-            cardsCurrentUnique.push(randomCard);
-          }
-        }
-        let cardsNames = shuffle([...cardsCurrentUnique, ...cardsCurrentUnique]);
-        this.cards = cardsNames.map((name, index) => ({name, index, flipped: true, visible: true}));
-        this.score = 0;
-
-        this.flipAllCards();
+        this.game = new Game();
+        this.keepFlipped = new Array(this.game.numberCards).fill(false);
+        this.scoreDelayed = 0;
+        this.flipAllCardsDelayed();
       },
       onResize() {
         let windowWidth = document.documentElement.clientWidth;
@@ -210,24 +186,33 @@
         }
       },
       onCardClick(card) {
-        if (card.flipped || !card.visible) {
-          // клик по уже открытой карте или клик по уже убраной карте
-          return;
-        }
-        card.flipped = true;
-
-        if (this.firstFlippedCard === null) {
-          // кроме текущей карты нет открытых карт
-          this.firstFlippedCard = card;
+        if (this.isCardFlipped(card)) {
           return;
         }
 
-        let firstFlippedCard = this.firstFlippedCard;
-        let numberPairsOpened = this.cards.filter(card => !card.visible).length / 2;
-        let numberPairsUnopened = this.cards.length / 2 - numberPairsOpened;
-        let areCardsEqual = card.name === firstFlippedCard.name;
-        let scoreDelta = 42 * (areCardsEqual ? numberPairsUnopened : -numberPairsOpened);
-        this.firstFlippedCard = null;
+        let score = this.game.score;
+        let [associated, pairCard] = this.game.flip(card.index);
+        let scoreDelta = this.game.score - score;
+        if (!pairCard) {
+          return;
+        }
+
+        if (associated) {
+          // ???
+          // const disappearCardPairDelay = 700;
+          // setTimeout(disappearCardPair, disappearCardPairDelay);
+        } else {
+          this.$set(this.keepFlipped, card.index, true);
+          this.$set(this.keepFlipped, pairCard.index, true);
+          const flipCardPairDelay = 1500;
+          const flipCardPair = () => {
+            this.$set(this.keepFlipped, card.index, false);
+            this.$set(this.keepFlipped, pairCard.index, false);
+            this.scoreDelayed += scoreDelta;
+            console.log(this.scoreDelayed);
+          };
+          setTimeout(flipCardPair, flipCardPairDelay);
+        }
 
         const disappearCardPair = () => {
           const animationDuration = 1000;
@@ -274,18 +259,10 @@
           }, animationDuration);
           card.visible = firstFlippedCard.visible = false;
         };
-
-        if (areCardsEqual) {
-          const disappearCardPairDelay = 700;
-          setTimeout(disappearCardPair, disappearCardPairDelay);
-        } else {
-          const flipCardPairDelay = 1500;
-          const flipCardPair = () => {
-            card.flipped = firstFlippedCard.flipped = false;
-            this.score += scoreDelta;
-          };
-          setTimeout(flipCardPair, flipCardPairDelay);
-        }
+      },
+      onButtonNewGameClick(event) {
+        event.target.blur();
+        this.startNewGame();
       }
     }
   };
