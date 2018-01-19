@@ -8,22 +8,27 @@
          alt="картинка из четырёх карт (лицевой стороной)">
     <h1 class="result-page__header header">
       Поздравляем!<br>
-      Ваш итоговый счёт: 594
+      Ваш итоговый счёт: {{score}}
     </h1>
-    <router-link
-      tag="button"
-      to="/game"
-      @click.native="$event.target.blur()"
+    <button
+      @click="onButtonRetryGameClick"
       class="result-page__button-new-game button"
       data-tid="EndGame-retryGame"
     >Ещё раз
-    </router-link>
+    </button>
   </div>
 </template>
 
 <script>
   export default {
-    name: 'result-page'
+    name: 'result-page',
+    props: ['score', 'moveToGamePage'],
+    methods: {
+      onButtonRetryGameClick(event) {
+        event.target.blur();
+        this.moveToGamePage();
+      }
+    }
   };
 </script>
 

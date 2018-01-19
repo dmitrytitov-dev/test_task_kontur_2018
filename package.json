@@ -16,8 +16,7 @@
     "lodash.range": "^3.2.0",
     "lodash.shuffle": "^4.2.0",
     "normalize.css": "^7.0.0",
-    "vue": "^2.5.2",
-    "vue-router": "^3.0.1"
+    "vue": "^2.5.2"
   },
   "devDependencies": {
     "autoprefixer": "^7.1.2",

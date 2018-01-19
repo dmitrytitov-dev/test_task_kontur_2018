@@ -1,12 +1,49 @@
 <template>
   <div id="app" data-tid="App">
-    <router-view/>
+    <intro-page v-if="state === State.INTRO"
+               :moveToGamePage="moveToGamePage"
+    ></intro-page>
+    <game-page v-if="state === State.GAME"
+               :moveToResultPage="moveToResultPage"
+    ></game-page>
+    <result-page v-if="state === State.RESULT"
+                 :score="score"
+                 :moveToGamePage="moveToGamePage"
+    ></result-page>
   </div>
 </template>
 
 <script>
+  import IntroPage from '@/components/IntroPage';
+  import GamePage from '@/components/GamePage';
+  import ResultPage from '@/components/ResultPage';
+
+  // enum с элементами, соответствующими экранам
+  const State = Object.freeze({
+    INTRO: 0,
+    GAME: 1,
+    RESULT: 2
+  });
+
   export default {
-    name: 'App'
+    name: 'App',
+    components: {ResultPage, GamePage, IntroPage},
+    data() {
+      return {
+        state: State.INTRO,
+        score: null,
+        State
+      };
+    },
+    methods: {
+      moveToGamePage() {
+        this.state = State.GAME;
+      },
+      moveToResultPage(score) {
+        this.score = score;
+        this.state = State.RESULT;
+      }
+    }
   };
 </script>
 

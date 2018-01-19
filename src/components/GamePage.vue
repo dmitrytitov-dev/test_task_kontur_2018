@@ -194,7 +194,8 @@
   }
 
   export default {
-    name: 'game',
+    name: 'game-page',
+    props: ['moveToResultPage'],
     data() {
       return {
         deskHeight: 3,
@@ -248,8 +249,8 @@
             cardsCurrentUnique.push(randomCard);
           }
         }
-        let cardsNames = /*shuffle*/([...cardsCurrentUnique, ...cardsCurrentUnique]);
-        this.cards = cardsNames.map((name, index) => { return {name, index, flipped: true, visible: true}; });
+        let cardsNames = shuffle([...cardsCurrentUnique, ...cardsCurrentUnique]);
+        this.cards = cardsNames.map((name, index) => ({name, index, flipped: true, visible: true}));
         this.score = 0;
 
         this.flipAllCards();
@@ -285,7 +286,6 @@
         let numberPairsOpened = this.cards.filter(card => !card.visible).length / 2;
         let numberPairsUnopened = this.cards.length / 2 - numberPairsOpened;
         let areCardsEqual = card.name === firstFlippedCard.name;
-        console.log(areCardsEqual, card.name, firstFlippedCard.name);
         let scoreDelta = 42 * (areCardsEqual ? numberPairsUnopened : -numberPairsOpened);
         this.firstFlippedCard = null;
 
@@ -326,7 +326,12 @@
 
           animateCard(card);
           animateCard(firstFlippedCard);
-          setTimeout(() => this.score += scoreDelta, animationDuration);
+          setTimeout(() => {
+            this.score += scoreDelta;
+            if (this.cards.every(card => !card.visible)) {
+              this.moveToResultPage(this.score);
+            }
+          }, animationDuration);
           card.visible = firstFlippedCard.visible = false;
         };
 
