@@ -35,8 +35,4 @@
   button:active:focus {
     outline: none;
   }
-
-  #app .menu__button-new-game:active {
-    color: #2196f3;
-  }
 </style>

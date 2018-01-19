@@ -69,6 +69,10 @@
     letter-spacing: -0.25px;
   }
 
+  .menu__button-new-game:active {
+    color: #00e676;
+  }
+
   .menu__scores-title {
     margin-left: auto;
     font-weight: bold;
