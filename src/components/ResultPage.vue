@@ -1,0 +1,42 @@
+<template>
+  <div class="result-page">
+    <img class="result-page__image responsive-image"
+         src="/static/images/EndGame.png"
+         srcset="/static/images/EndGame.png 508w,
+                 /static/images/EndGame@2x.png 1016w"
+         sizes="40vw"
+         alt="картинка из четырёх карт (лицевой стороной)">
+    <h1 class="result-page__header header">
+      Поздравляем!<br>
+      Ваш итоговый счёт: 594
+    </h1>
+    <router-link
+      tag="button"
+      to="/game"
+      @click.native="$event.target.blur()"
+      class="result-page__button-new-game button"
+      data-tid="EndGame-retryGame"
+    >Ещё раз
+    </router-link>
+  </div>
+</template>
+
+<script>
+  export default {
+    name: 'result-page'
+  };
+</script>
+
+<style scoped>
+  .result-page {
+    text-align: center;
+  }
+
+  .result-page__header {
+    margin-top: 1.5vh;
+    margin-bottom: 6.7vh;
+    font-size: 4.9vmin;
+    line-height: 5.7vmin;
+    letter-spacing: 0.15px;
+  }
+</style>
