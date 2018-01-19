@@ -3,30 +3,29 @@
     <div class="game-page__menu menu">
       <button class="menu__button-new-game" data-tid="Menu-newGame" @click="onButtonNewGameClick">Начать заново</button>
       <span class="menu__scores-title">Очки:</span>
-      <span class="menu__scores-value" data-tid="Menu-scores">{{score}}</span>
+      <span class="menu__scores-value" data-tid="Menu-scores" ref="scoresValue">{{score}}</span>
     </div>
     <div class="game-page__cards cards"
          data-tid="Deck"
          ref="cards"
     >
-      <div :class="['cards__card card', {'card_flipped': card.flipped, 'card_visible': card.visible}]"
-           v-if="cards"
-           v-for="(card, index) of cards"
-           @click="onCardClick(index)"
-           :data-tid="card.flipped ? 'Card-flipped' : (card.visible ? 'Card' : null)"
-      >
-        <div class="card__inner">
-          <img class="card__frontside"
-               :src="`/static/cards/${card.name}.png`"
-               alt=""
-          >
-          <img class="card__backside"
-               :src="`/static/backside.png`"
-               alt=""
-               v-if="card.visible"
-          >
+      <template v-if="cards" v-for="card of cards">
+        <div :class="['cards__card card', {'card_flipped': card.flipped, 'card_visible': card.visible}]"
+             @click="onCardClick(card)"
+             :data-tid="card.flipped ? 'Card-flipped' : (card.visible ? 'Card' : null)"
+        >
+          <div class="card__inner">
+            <img class="card__frontside"
+                 :src="`/static/cards/${card.name}.png`"
+                 alt=""
+            >
+            <img class="card__backside"
+                 :src="`/static/backside.png`"
+                 alt=""
+            >
+          </div>
         </div>
-      </div>
+      </template>
     </div>
   </div>
 </template>
@@ -131,10 +130,11 @@
 
   .card {
     perspective: 1000px;
+    cursor: pointer;
   }
 
-  .card_visible {
-    cursor: pointer;
+  .card:not(.card_visible) {
+    visibility: hidden;
   }
 
   /* https://davidwalsh.name/css-flip */
@@ -196,7 +196,7 @@
         deskHeight: 3,
         deskWidth: 6,
         cards: null,
-        firstFlippedCardIndex: null,
+        firstFlippedCard: null,
         score: 0,
         removeCardsFlipTimeoutId: null
       };
@@ -225,8 +225,9 @@
           }
           this.removeCardsFlipTimeoutId = null;
         };
-        // const removeCardsFlipDelay = 5000;
-        const removeCardsFlipDelay = 700;
+        const removeCardsFlipDelay = 5000;
+        // const removeCardsFlipDelay = 700;
+        // const removeCardsFlipDelay = 2000;
         this.removeCardsFlipTimeoutId = setTimeout(removeCardsFlip, removeCardsFlipDelay);
       },
       startNewGame() {
@@ -237,16 +238,14 @@
 
         let cardsCurrentUnique = [];
         while (cardsCurrentUnique.length < 9) {
-          // let randomIndex = Math.floor(Math.random() * cardsAll.length);
-          let randomIndex = 1;
+          let randomIndex = Math.floor(Math.random() * cardsAll.length);
           let randomCard = cardsAll[randomIndex];
-          /*if (cardsCurrentUnique.indexOf(randomCard) === -1)*/
-          {
+          if (cardsCurrentUnique.indexOf(randomCard) === -1) {
             cardsCurrentUnique.push(randomCard);
           }
         }
         let cardsNames = /*shuffle*/([...cardsCurrentUnique, ...cardsCurrentUnique]);
-        this.cards = cardsNames.map(name => {return {name, flipped: true, visible: true}; });
+        this.cards = cardsNames.map((name, index) => { return {name, index, flipped: true, visible: true}; });
         this.score = 0;
 
         this.flipAllCards();
@@ -265,36 +264,79 @@
           this.$refs.cards.style.setProperty('--card-scale', cardScale);
         }
       },
-      onCardClick(cardIndex) {
-        let card = this.cards[cardIndex];
+      onCardClick(card) {
         if (card.flipped || !card.visible) {
           // клик по уже открытой карте или клик по уже убраной карте
           return;
         }
         card.flipped = true;
 
-        if (this.firstFlippedCardIndex === null) {
+        if (this.firstFlippedCard === null) {
           // кроме текущей карты нет открытых карт
-          this.firstFlippedCardIndex = cardIndex;
+          this.firstFlippedCard = card;
           return;
         }
 
-        let flippedCard = this.cards[this.firstFlippedCardIndex];
+        let firstFlippedCard = this.firstFlippedCard;
         let numberPairsOpened = this.cards.filter(card => !card.visible).length / 2;
         let numberPairsUnopened = this.cards.length / 2 - numberPairsOpened;
-        if (card.name === flippedCard.name) {
-          this.score += numberPairsUnopened * 42;
-        } else {
-          this.score -= numberPairsOpened * 42;
-        }
-        this.firstFlippedCardIndex = null;
+        let areCardsEqual = card.name === firstFlippedCard.name;
+        console.log(areCardsEqual, card.name, firstFlippedCard.name);
+        let scoreDelta = 42 * (areCardsEqual ? numberPairsUnopened : -numberPairsOpened);
+        this.firstFlippedCard = null;
 
-        const flipCardPair = () => {
-          card.flipped = flippedCard.flipped = false;
-          card.visible = flippedCard.visible = false;
+        const disappearCardPair = () => {
+          const animationDuration = 1000;
+          let animateCard = (card) => {
+            let cardElement = this.$refs.cards.children[card.index];
+            let cardBoundingRect = cardElement.getBoundingClientRect();
+            let scoresBoundingRect = this.$refs.scoresValue.getBoundingClientRect();
+
+            let moveKeyframes = [
+              {
+                left: cardBoundingRect.left + 'px',
+                top: cardBoundingRect.top + 'px',
+                opacity: 1
+              },
+              {
+                left: (scoresBoundingRect.right - cardBoundingRect.width) + 'px',
+                top: scoresBoundingRect.top + 'px',
+                opacity: 0
+              }
+            ];
+            let animatedElement = document.createElement('img');
+            document.body.appendChild(animatedElement);
+            animatedElement.src = cardElement.getElementsByClassName('card__frontside')[0].src;
+            animatedElement.style.position = 'absolute';
+            animatedElement.style.left = cardBoundingRect.right + 'px';
+            animatedElement.style.top = cardBoundingRect.top + 'px';
+            animatedElement.style.width = cardBoundingRect.width + 'px';
+            animatedElement.style.height = cardBoundingRect.height + 'px';
+            let animation = animatedElement.animate(moveKeyframes, {
+              duration: animationDuration,
+              easing: 'ease-out',
+              fill: 'forwards'
+            });
+            animation.addEventListener('finish', () => animatedElement.remove());
+          };
+
+          animateCard(card);
+          animateCard(firstFlippedCard);
+          setTimeout(() => this.score += scoreDelta, animationDuration);
+          card.visible = firstFlippedCard.visible = false;
         };
-        const flipCardPairDelay = 1500;
-        setTimeout(flipCardPair, flipCardPairDelay);
+
+        if (areCardsEqual) {
+          const disappearCardPairDelay = 700;
+          setTimeout(disappearCardPair, disappearCardPairDelay);
+        } else {
+          const flipCardPairDelay = 1500;
+          const flipCardPair = () => {
+            card.flipped = firstFlippedCard.flipped = false;
+            this.score += scoreDelta;
+          };
+          setTimeout(flipCardPair, flipCardPairDelay);
+        }
       }
     }
   };

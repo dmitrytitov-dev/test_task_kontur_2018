@@ -1,12 +1,12 @@
 <template>
-  <div class="container">
+  <div class="mainpage">
     <img src="/static/images/StartGame.png" alt="картинка из четырёх карт, три из которых показаны рубашкой">
-    <div class="header">Memory game</div>
+    <div class="mainpage__header">Memory game</div>
     <router-link
       tag="button"
       to="/game"
       @click.native="$event.target.blur()"
-      class="menu__button-new-game"
+      class="mainpage__button-new-game"
       data-tid="NewGame-startGame">Начать игру
     </router-link>
   </div>
@@ -24,7 +24,7 @@
 </script>
 
 <style scoped>
-  .container {
+  .mainpage {
     /*height: 100%;*/
     /*display: flex;*/
     /*flex-direction: column;*/
@@ -33,7 +33,7 @@
     text-align: center;
   }
 
-  .header {
+  .mainpage__header {
     margin-top: 3.3vh;
     opacity: 0.85;
     font-weight: bold;
@@ -43,7 +43,7 @@
     text-transform: uppercase;
   }
 
-  .menu__button-new-game {
+  .mainpage__button-new-game {
     margin-top: 5.7vh;
     width: 144px;
     height: 42px;
@@ -57,15 +57,15 @@
     font-size: 16px;
     color: #1C7430;
     letter-spacing: 0;
-    transition: all .1s;
+    transition: transform .1s;
   }
 
-  .menu__button-new-game:hover {
+  .mainpage__button-new-game:hover {
     cursor: pointer;
     transform: scale(1.2);
   }
 
-  .menu__button-new-game:focus {
+  .mainpage__button-new-game:focus {
     /* я не придумал как переопределить outline, поэтому оставил стандартную рамку */
     /* outline: none; */
   }
