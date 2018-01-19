@@ -1,10 +1,9 @@
 <template>
   <div class="game-page">
-    <div class="game-page__menu menu">
-      <button class="menu__button-new-game" data-tid="Menu-newGame" @click="onButtonNewGameClick">Начать заново</button>
-      <span class="menu__scores-title">Очки:</span>
-      <span class="menu__scores-value" data-tid="Menu-scores" ref="scoresValue">{{score}}</span>
-    </div>
+    <game-page-menu class="game-page__menu"
+                    :score="score"
+                    ref="menu"
+    ></game-page-menu>
     <div class="game-page__cards cards"
          data-tid="Deck"
          ref="cards"
@@ -33,56 +32,6 @@
 <style scoped>
   .game-page__cards {
     margin-top: 4vh;
-  }
-
-  /* =========== стили меню =========== */
-
-  .menu {
-    display: flex;
-  }
-
-  .menu__button-new-game, .menu__scores-title, .menu__scores-value {
-    opacity: 0.8;
-    font-size: 14px;
-    color: white;
-  }
-
-  /* увеличение нажимаемой области кнопки (для удобства) */
-  /* https://stackoverflow.com/questions/19246893/increasing-clickable-area-of-a-button */
-  .menu__button-new-game:before {
-    position: absolute;
-    content: '';
-    top: -1vh;
-    right: -1vw;
-    left: -1vw;
-    bottom: -1vh;
-  }
-
-  .menu__button-new-game {
-    position: relative; /* чтобы у .button:before работал position: absolute; */
-    padding: 0;
-    background: none;
-    border: none;
-    cursor: pointer;
-
-    font-weight: 600; /* semi-bold */
-    letter-spacing: -0.25px;
-  }
-
-  .menu__button-new-game:active {
-    color: #00e676;
-  }
-
-  .menu__scores-title {
-    margin-left: auto;
-    font-weight: bold;
-    letter-spacing: 0;
-  }
-
-  .menu__scores-value {
-    margin-left: 0.4vw;
-    font-family: Krungthep, monospace;
-    letter-spacing: 0;
   }
 
   /* =========== стили карт =========== */
@@ -147,18 +96,18 @@
   }
 
   .card__inner {
+    width: 100%;
+    height: 100%;
     position: relative;
     transition: transform 0.6s;
     transform-style: preserve-3d;
-    width: 100%;
-    height: 100%;
   }
 
   .card__frontside, .card__backside {
-    min-width: 0;
-    min-height: 0;
     width: 100%;
     height: 100%;
+    min-width: 0;
+    min-height: 0;
     backface-visibility: hidden;
 
     object-fit: contain;
@@ -173,15 +122,12 @@
   .card__frontside {
     transform: rotateY(180deg);
   }
-
-  .card__backside {
-    /*z-index: 1;*/
-  }
 </style>
 
 <script>
   import range from 'lodash.range';
   import shuffle from 'lodash.shuffle';
+  import GamePageMenu from '@/components/GamePage/GamePageMenu';
 
   function getAllCards(suits, ranks) {
     let cards = [];
@@ -194,6 +140,7 @@
   }
 
   export default {
+    components: {GamePageMenu},
     name: 'game-page',
     props: ['moveToResultPage'],
     data() {
@@ -294,7 +241,7 @@
           let animateCard = (card) => {
             let cardElement = this.$refs.cards.children[card.index];
             let cardBoundingRect = cardElement.getBoundingClientRect();
-            let scoresBoundingRect = this.$refs.scoresValue.getBoundingClientRect();
+            let scoresBoundingRect = this.$refs.menu.$el.getBoundingClientRect();
 
             let moveKeyframes = [
               {

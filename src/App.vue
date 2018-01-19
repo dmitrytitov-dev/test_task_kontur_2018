@@ -15,7 +15,7 @@
 
 <script>
   import IntroPage from '@/components/IntroPage';
-  import GamePage from '@/components/GamePage';
+  import GamePage from '@/components/GamePage/GamePage';
   import ResultPage from '@/components/ResultPage';
 
   // enum с элементами, соответствующими экранам
