@@ -2,6 +2,7 @@
   <div class="game-page">
     <game-page-menu class="game-page__menu"
                     :score="score"
+                    :onButtonNewGameClick="onButtonNewGameClick"
                     ref="menu"
     ></game-page-menu>
     <div class="game-page__cards cards"
@@ -60,23 +61,17 @@
     /* к сожалению, функция calc не поддерживает взятие минимума, поэтому эту переменную придётся считать в javascript */
     /* --card-scale: <javascript> */
 
-    /* карты имеют размер 226px на 314px */
+    /* зная значение --card-scale можем рассчитать размер карты */
     --card-width: calc(226px * var(--card-scale));
     --card-height: calc(314px * var(--card-scale));
 
-    width: calc(var(--card-width) * 6 + var(--grid-gap) * 5);
-    height: calc(var(--card-height) * 3 + var(--grid-gap) * 2);
-
+    /* поле это сетка, с расстояними между картами равным --grid-gap и известной шириной/высотой (одинаковой) каждого элемента */
     display: grid;
-    grid-template: repeat(3, 1fr) / repeat(6, 1fr);
+    grid-template: repeat(3, var(--card-height)) / repeat(6, var(--card-width));
     grid-gap: var(--grid-gap);
-    align-items: center;
-    justify-items: center;
   }
 
   .cards__card {
-    min-width: 0;
-    min-height: 0;
     width: 100%;
     height: 100%;
   }
@@ -106,8 +101,6 @@
   .card__frontside, .card__backside {
     width: 100%;
     height: 100%;
-    min-width: 0;
-    min-height: 0;
     backface-visibility: hidden;
 
     object-fit: contain;

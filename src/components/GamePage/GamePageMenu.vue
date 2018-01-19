@@ -59,6 +59,6 @@
 <script>
   export default {
     name: 'game-page-menu',
-    props: ['score']
+    props: ['score', 'onButtonNewGameClick']
   };
 </script>
