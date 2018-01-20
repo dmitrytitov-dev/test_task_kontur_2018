@@ -48,6 +48,7 @@ export default class Game {
 
     let gameCardsUnique = generateRandomCombination(allCards, numberUniqueCards);
     let gameCardsNames = shuffle([...gameCardsUnique, ...gameCardsUnique]);
+    // gameCardsNames = new Array(gameCardsNames.length).fill(allCards[0]);
     this.cards = gameCardsNames.map((name, index) => ({name, index, flipped: true, associated: false}));
     this.height = height;
     this.width = width;
