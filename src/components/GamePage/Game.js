@@ -48,9 +48,8 @@ export default class Game {
     }
 
     let gameCardsUnique = generateRandomCombination(allCards, numberUniqueCards);
-    let gameCardsNames = shuffle([...gameCardsUnique, ...gameCardsUnique]);
-    gameCardsNames = [allCards[0], ...new Array(gameCardsNames.length - 1).fill(allCards[1])];
-    this.cards = gameCardsNames;
+    this.cards = shuffle([...gameCardsUnique, ...gameCardsUnique]);
+    // this.cards = [allCards[0], ...new Array(gameCardsNames.length - 1).fill(allCards[1])];
     this.height = height;
     this.width = width;
     this.numberPairsAssociated = 0;
@@ -59,6 +58,7 @@ export default class Game {
 
   flipPair(card1, card2) {
     if (this.cards[card1] === this.cards[card2]) {
+      ++this.numberPairsAssociated;
       let numberPairsUnassociated = this.cards.length / 2 - this.numberPairsAssociated;
       this.score += GAME_SCORE_FACTOR * numberPairsUnassociated;
       return true;
@@ -66,5 +66,9 @@ export default class Game {
       this.score -= GAME_SCORE_FACTOR * this.numberPairsAssociated;
       return false;
     }
+  }
+
+  isGameEnd() {
+    return this.numberPairsAssociated === this.cards.length / 2;
   }
 }

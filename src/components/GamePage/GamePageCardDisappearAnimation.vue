@@ -14,7 +14,7 @@
     position: absolute;
     animation-name: disappear;
     animation-delay: 100ms;
-    animation-duration: 1s;
+    animation-duration: 700ms;
     animation-timing-function: ease-out;
     animation-fill-mode: forwards;
     top: var(--animation-start-top);

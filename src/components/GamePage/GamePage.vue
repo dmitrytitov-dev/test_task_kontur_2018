@@ -2,7 +2,7 @@
   <div class="game-page" v-if="game">
     <game-page-menu class="game-page__menu"
                     ref="menu"
-                    v-bind="{score: game.score, onButtonNewGameClick}"
+                    v-bind="{score: scoreDelayed, onButtonNewGameClick}"
     ></game-page-menu>
     <game-page-cards class="game-page__cards"
                      ref="cards"
@@ -55,11 +55,12 @@
     props: ['moveToResultPage'],
     data() {
       return {
+        gameId: 0,
         game: null,
         cards: null,
+        scoreDelayed: null,
         firstFlippedCard: null,
-        cardDisappearAnimations: [],
-        gameId: 0
+        cardDisappearAnimations: []
       };
     },
     mounted() {
@@ -76,6 +77,7 @@
         let currentGameId = ++this.gameId;
         this.game = new Game();
         this.cards = this.game.cards.map((cardName, index) => ({index, name: cardName, flipped: true, associated: false}));
+        this.scoreDelayed = 0;
         this.firstFlippedCard = null;
         this.cardDisappearAnimations = [];
 
@@ -116,12 +118,15 @@
         this.firstFlippedCard = null;
 
         await sleep(GAME_CARDS_FLIP_ANIMATION_DURATION);
+        let score = this.game.score;
         let associated = this.game.flipPair(card.index, firstFlippedCard.index);
+        let scoreDelta = this.game.score - score;
         if (associated) {
           await this.disappearCardPair(card, firstFlippedCard);
         } else {
           await this.flipCardPair(card, firstFlippedCard);
         }
+        this.scoreDelayed += scoreDelta;
       },
       async flipCardPair(card1, card2) {
         await sleep(GAME_DELAY_BETWEEN_CARD_OPEN_AND_FLIP_START);
@@ -130,11 +135,16 @@
       async disappearCardPair(card1, card2) {
         await sleep(GAME_DELAY_BETWEEN_CARD_OPEN_AND_DISAPPEAR_START);
         card1.associated = card2.associated = true;
+        card1.flipped = card2.flipped = false;
         this.disappearCard(card1);
         this.disappearCard(card2);
+
         // столько длится анимация в компоненте GamePageCardDisappearAnimation,
         // можно было передавать это значение как параметр в тот компонент, но я не стал
-        await sleep(1100);
+        await sleep(800);
+        if (this.game.isGameEnd()) {
+          this.moveToResultPage(this.game.score);
+        }
       },
       disappearCard(card) {
         let cardElement = this.$refs.cards.$el.children[card.index];
