@@ -2,15 +2,11 @@
   <div class="game-page" v-if="game">
     <game-page-menu class="game-page__menu"
                     ref="menu"
-                    :score="scoreDelayed"
-                    :onButtonNewGameClick="onButtonNewGameClick"
+                    v-bind="{score: scoreDelayed, onButtonNewGameClick}"
     ></game-page-menu>
     <game-page-cards class="game-page__cards"
                      ref="cards"
-                     :cards="game.cards"
-                     :isCardFlipped="isCardFlipped"
-                     :isCardAssociated="isCardAssociated"
-                     :onCardClick="onCardClick"
+                     v-bind="{cards: game.cards, isCardFlipped, isCardAssociated, onCardClick}"
     ></game-page-cards>
     <game-page-card-disappear-animation v-for="animation of cardDisappearAnimations"
                                         class="game-page__card-disappear-animation"
@@ -43,18 +39,19 @@
   import Game from './Game.js';
   import GamePageCards from '@/components/GamePage/GamePageCards';
   import GamePageCardDisappearAnimation from '@/components/GamePage/GamePageCardDisappearAnimation';
+  import {GAME_DELAY_BETWEEN_CARD_OPEN_AND_DISAPPEAR_START, GAME_DELAY_BETWEEN_CARD_OPEN_AND_FLIP_START, GAME_DELAY_BETWEEN_GAME_START_AND_FLIP_ALL_CARDS} from '@/components/constants';
 
   function sleep(milliseconds) {
     return new Promise(resolve => setTimeout(resolve, milliseconds));
   }
 
   export default {
-    components: {
-      GamePageCardDisappearAnimation,
-      GamePageCards,
-      GamePageMenu
-    },
     name: 'game-page',
+    components: {
+      GamePageMenu,
+      GamePageCards,
+      GamePageCardDisappearAnimation
+    },
     props: ['moveToResultPage'],
     data() {
       return {
@@ -92,10 +89,7 @@
           }
           this.flipAllCardsDelayedId = null;
         };
-        // const removeCardsFlipDelay = 5000;
-        // const removeCardsFlipDelay = 2000;
-        const removeCardsFlipDelay = 700;
-        this.flipAllCardsDelayedId = setTimeout(flipAllCardsDelayedHandler, removeCardsFlipDelay);
+        this.flipAllCardsDelayedId = setTimeout(flipAllCardsDelayedHandler, GAME_DELAY_BETWEEN_GAME_START_AND_FLIP_ALL_CARDS);
       },
       startNewGame() {
         this.game = new Game();
@@ -132,21 +126,20 @@
         }
 
         if (associated) {
-          await this.disappearCardPairDelayed(card, pairCard);
+          await this.disappearCardPair(card, pairCard);
         } else {
-          await this.flipCardPairDelayed(card.index, pairCard.index);
+          await this.flipCardPair(card.index, pairCard.index);
         }
         this.scoreDelayed += scoreDelta;
       },
-      async flipCardPairDelayed(cardIndex1, cardIndex2) {
+      async flipCardPair(cardIndex1, cardIndex2) {
         this.$set(this.keepFlipped, cardIndex1, true);
         this.$set(this.keepFlipped, cardIndex2, true);
-        const delay = 1000;
-        await sleep(delay);
+        await sleep(GAME_DELAY_BETWEEN_CARD_OPEN_AND_FLIP_START);
         this.$set(this.keepFlipped, cardIndex1, false);
         this.$set(this.keepFlipped, cardIndex2, false);
       },
-      async disappearCardPairDelayed(card1, card2) {
+      async disappearCardPair(card1, card2) {
         const setKeep = (value) => {
           for (let card of [card1, card2]) {
             for (let keepArray of [this.keepNotAssociated, this.keepFlipped]) {
@@ -156,18 +149,18 @@
         };
 
         setKeep(true);
-        const delay = 700;
-        await sleep(delay);
+        await sleep(GAME_DELAY_BETWEEN_CARD_OPEN_AND_DISAPPEAR_START);
         setKeep(false);
         this.disappearCard(card1);
         this.disappearCard(card2);
-        await sleep(1000);
+        // столько длится анимация в компоненте GamePageCardDisappearAnimation,
+        // можно было передавать это значение как параметр в тот компонент, но я не стал
+        await sleep(1100);
       },
       disappearCard(card) {
         let cardElement = this.$refs.cards.$el.children[card.index];
         let cardBoundingRect = cardElement.getBoundingClientRect();
         let componentElement = this.$el.getBoundingClientRect();
-        // добавить в animation callback изменения очков
         let animation = {
           card,
           top: cardBoundingRect.top - componentElement.top,

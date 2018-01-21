@@ -1,5 +1,6 @@
 import range from 'lodash.range';
 import shuffle from 'lodash.shuffle';
+import {GAME_SCORE_FACTOR} from '@/components/constants';
 
 function getAllCards() {
   let suits = ['C', 'D', 'H', 'S'];
@@ -48,7 +49,7 @@ export default class Game {
 
     let gameCardsUnique = generateRandomCombination(allCards, numberUniqueCards);
     let gameCardsNames = shuffle([...gameCardsUnique, ...gameCardsUnique]);
-    // gameCardsNames = new Array(gameCardsNames.length).fill(allCards[0]);
+    gameCardsNames = new Array(gameCardsNames.length).fill(allCards[0]);
     this.cards = gameCardsNames.map((name, index) => ({name, index, flipped: true, associated: false}));
     this.height = height;
     this.width = width;
@@ -81,10 +82,10 @@ export default class Game {
     let numberPairsUnassociated = this.cards.length / 2 - numberPairsAssociated;
     let associated = card.name === firstFlippedCard.name;
     if (associated) {
-      this.score += 42 * numberPairsUnassociated;
+      this.score += GAME_SCORE_FACTOR * numberPairsUnassociated;
       card.associated = firstFlippedCard.associated = true;
     } else {
-      this.score -= 42 * numberPairsAssociated;
+      this.score -= GAME_SCORE_FACTOR * numberPairsAssociated;
     }
     this.firstFlippedCard = null;
     return [associated, firstFlippedCard];

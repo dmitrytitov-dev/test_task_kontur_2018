@@ -1,6 +1,6 @@
 <template>
   <div class="animation">
-    <img :class="['animation__image', {'animation__image_animated': isAnimationStart}]"
+    <img class="animation__image"
          :style="{height: animation.height + 'px', width: animation.width + 'px'}"
          :src="`/static/cards/${animation.card.name}.png`"
          alt=""
@@ -38,11 +38,6 @@
   export default {
     name: 'game-page-card-disappear-animation',
     props: ['animation'],
-    data() {
-      return {
-        isAnimationStart: false
-      };
-    },
     mounted() {
       this.$el.style.setProperty('--animation-start-top', this.animation.top + 'px');
       this.$el.style.setProperty('--animation-start-right', this.animation.right + 'px');
