@@ -58,8 +58,8 @@
         game: null,
         cards: null,
         firstFlippedCard: null,
-        flipAllCardsDelayedId: null,
-        cardDisappearAnimations: []
+        cardDisappearAnimations: [],
+        gameId: 0
       };
     },
     mounted() {
@@ -72,24 +72,20 @@
       window.removeEventListener('resize', this.onResize);
     },
     methods: {
-      flipAllCardsDelayed() {
-        if (this.flipAllCardsDelayedId) {
-          clearTimeout(this.flipAllCardsDelayedId);
-        }
-        const flipAllCardsDelayedHandler = () => {
+      async startNewGame() {
+        let currentGameId = ++this.gameId;
+        this.game = new Game();
+        this.cards = this.game.cards.map((cardName, index) => ({index, name: cardName, flipped: true, associated: false}));
+        this.firstFlippedCard = null;
+        this.cardDisappearAnimations = [];
+
+        await sleep(GAME_DELAY_BETWEEN_GAME_START_AND_FLIP_ALL_CARDS);
+        // проверка на случай, если в течении первых пяти секунд пользователь нажал кнопку начала новой игры
+        if (currentGameId === this.gameId) {
           for (let card of this.cards) {
             card.flipped = false;
           }
-          this.flipAllCardsDelayedId = null;
-        };
-        this.flipAllCardsDelayedId = setTimeout(flipAllCardsDelayedHandler, GAME_DELAY_BETWEEN_GAME_START_AND_FLIP_ALL_CARDS);
-      },
-      startNewGame() {
-        this.game = new Game();
-        this.cardDisappearAnimations = [];
-        this.cards = this.game.cards.map((cardName, index) => ({index, name: cardName, flipped: true, associated: false}));
-        this.firstFlippedCard = null;
-        this.flipAllCardsDelayed();
+        }
       },
       onResize() {
         let windowWidth = document.documentElement.clientWidth;
