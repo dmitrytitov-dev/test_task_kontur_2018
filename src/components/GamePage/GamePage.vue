@@ -2,11 +2,11 @@
   <div class="game-page" v-if="game">
     <game-page-menu class="game-page__menu"
                     ref="menu"
-                    v-bind="{score: scoreDelayed, onButtonNewGameClick}"
+                    v-bind="{score: game.score, onButtonNewGameClick}"
     ></game-page-menu>
     <game-page-cards class="game-page__cards"
                      ref="cards"
-                     v-bind="{cards: game.cards, isCardFlipped, isCardAssociated, onCardClick}"
+                     v-bind="{cards, onCardClick}"
     ></game-page-cards>
     <game-page-card-disappear-animation v-for="animation of cardDisappearAnimations"
                                         class="game-page__card-disappear-animation"
@@ -39,7 +39,7 @@
   import Game from './Game.js';
   import GamePageCards from '@/components/GamePage/GamePageCards';
   import GamePageCardDisappearAnimation from '@/components/GamePage/GamePageCardDisappearAnimation';
-  import {GAME_DELAY_BETWEEN_CARD_OPEN_AND_DISAPPEAR_START, GAME_DELAY_BETWEEN_CARD_OPEN_AND_FLIP_START, GAME_DELAY_BETWEEN_GAME_START_AND_FLIP_ALL_CARDS} from '@/components/constants';
+  import {GAME_CARDS_FLIP_ANIMATION_DURATION, GAME_DELAY_BETWEEN_CARD_OPEN_AND_DISAPPEAR_START, GAME_DELAY_BETWEEN_CARD_OPEN_AND_FLIP_START, GAME_DELAY_BETWEEN_GAME_START_AND_FLIP_ALL_CARDS} from '@/components/constants';
 
   function sleep(milliseconds) {
     return new Promise(resolve => setTimeout(resolve, milliseconds));
@@ -56,11 +56,10 @@
     data() {
       return {
         game: null,
-        keepFlipped: null,
-        scoreDelayed: 0,
+        cards: null,
+        firstFlippedCard: null,
         flipAllCardsDelayedId: null,
-        cardDisappearAnimations: [],
-        keepNotAssociated: []
+        cardDisappearAnimations: []
       };
     },
     mounted() {
@@ -73,18 +72,12 @@
       window.removeEventListener('resize', this.onResize);
     },
     methods: {
-      isCardFlipped(card) {
-        return card.flipped || this.keepFlipped[card.index];
-      },
-      isCardAssociated(card) {
-        return card.associated && !this.keepNotAssociated[card.index];
-      },
       flipAllCardsDelayed() {
         if (this.flipAllCardsDelayedId) {
           clearTimeout(this.flipAllCardsDelayedId);
         }
         const flipAllCardsDelayedHandler = () => {
-          for (let card of this.game.cards) {
+          for (let card of this.cards) {
             card.flipped = false;
           }
           this.flipAllCardsDelayedId = null;
@@ -93,10 +86,9 @@
       },
       startNewGame() {
         this.game = new Game();
-        this.keepFlipped = new Array(this.game.numberCards).fill(false);
-        this.keepNotAssociated = new Array(this.game.numberCards).fill(false);
-        this.scoreDelayed = 0;
         this.cardDisappearAnimations = [];
+        this.cards = this.game.cards.map((cardName, index) => ({index, name: cardName, flipped: true, associated: false}));
+        this.firstFlippedCard = null;
         this.flipAllCardsDelayed();
       },
       onResize() {
@@ -114,43 +106,34 @@
         }
       },
       async onCardClick(card) {
-        if (this.isCardFlipped(card)) {
+        if (card.flipped) {
+          return;
+        }
+        card.flipped = true;
+
+        if (this.firstFlippedCard === null) {
+          this.firstFlippedCard = card;
           return;
         }
 
-        let score = this.game.score;
-        let [associated, pairCard] = this.game.flip(card.index);
-        let scoreDelta = this.game.score - score;
-        if (!pairCard) {
-          return;
-        }
+        let firstFlippedCard = this.firstFlippedCard;
+        this.firstFlippedCard = null;
 
+        await sleep(GAME_CARDS_FLIP_ANIMATION_DURATION);
+        let associated = this.game.flipPair(card.index, firstFlippedCard.index);
         if (associated) {
-          await this.disappearCardPair(card, pairCard);
+          await this.disappearCardPair(card, firstFlippedCard);
         } else {
-          await this.flipCardPair(card.index, pairCard.index);
+          await this.flipCardPair(card, firstFlippedCard);
         }
-        this.scoreDelayed += scoreDelta;
       },
-      async flipCardPair(cardIndex1, cardIndex2) {
-        this.$set(this.keepFlipped, cardIndex1, true);
-        this.$set(this.keepFlipped, cardIndex2, true);
+      async flipCardPair(card1, card2) {
         await sleep(GAME_DELAY_BETWEEN_CARD_OPEN_AND_FLIP_START);
-        this.$set(this.keepFlipped, cardIndex1, false);
-        this.$set(this.keepFlipped, cardIndex2, false);
+        card1.flipped = card2.flipped = false;
       },
       async disappearCardPair(card1, card2) {
-        const setKeep = (value) => {
-          for (let card of [card1, card2]) {
-            for (let keepArray of [this.keepNotAssociated, this.keepFlipped]) {
-              this.$set(keepArray, card.index, value);
-            }
-          }
-        };
-
-        setKeep(true);
         await sleep(GAME_DELAY_BETWEEN_CARD_OPEN_AND_DISAPPEAR_START);
-        setKeep(false);
+        card1.associated = card2.associated = true;
         this.disappearCard(card1);
         this.disappearCard(card2);
         // столько длится анимация в компоненте GamePageCardDisappearAnimation,

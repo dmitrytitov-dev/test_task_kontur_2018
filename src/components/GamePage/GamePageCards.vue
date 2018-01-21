@@ -1,8 +1,8 @@
 <template>
   <div class="cards" data-tid="Deck">
-    <div v-for="card of cards" :class="['cards__card card', {'card_flipped': isCardFlipped(card), 'card_associated': isCardAssociated(card)}]"
+    <div v-for="card of cards" :class="['cards__card card', {'card_flipped': card.flipped, 'card_associated': card.associated}]"
          @click="onCardClick(card)"
-         :data-tid="isCardFlipped(card) ? 'Card-flipped' : (isCardAssociated(card) ? null : 'Card')"
+         :data-tid="card.flipped ? 'Card-flipped' : (card.associated ? null : 'Card')"
     >
       <div class="card__inner">
         <img class="card__frontside"
@@ -108,6 +108,6 @@
 <script>
   export default {
     name: 'game-page-cards',
-    props: ['cards', 'isCardFlipped', 'isCardAssociated', 'onCardClick']
+    props: ['cards', 'onCardClick']
   };
 </script>

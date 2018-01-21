@@ -49,45 +49,22 @@ export default class Game {
 
     let gameCardsUnique = generateRandomCombination(allCards, numberUniqueCards);
     let gameCardsNames = shuffle([...gameCardsUnique, ...gameCardsUnique]);
-    gameCardsNames = new Array(gameCardsNames.length).fill(allCards[0]);
-    this.cards = gameCardsNames.map((name, index) => ({name, index, flipped: true, associated: false}));
+    gameCardsNames = [allCards[0], ...new Array(gameCardsNames.length - 1).fill(allCards[1])];
+    this.cards = gameCardsNames;
     this.height = height;
     this.width = width;
+    this.numberPairsAssociated = 0;
     this.score = 0;
-    this.firstFlippedCard = null;
   }
 
-  get numberCards() {
-    return this.height * this.width;
-  }
-
-  flip(cardIndex) {
-    let card = this.cards[cardIndex];
-    if (card.flipped || card.associated) {
-      // клик по уже открытой карте или клик по уже убранной карте
-      return [false, null];
-    }
-
-    if (this.firstFlippedCard === null) {
-      // кроме текущей карты нет открытых карт
-      card.flipped = true;
-      this.firstFlippedCard = card;
-      return [false, null];
-    }
-
-    let firstFlippedCard = this.firstFlippedCard;
-    firstFlippedCard.flipped = false;
-
-    let numberPairsAssociated = this.cards.filter(card => card.associated).length / 2;
-    let numberPairsUnassociated = this.cards.length / 2 - numberPairsAssociated;
-    let associated = card.name === firstFlippedCard.name;
-    if (associated) {
+  flipPair(card1, card2) {
+    if (this.cards[card1] === this.cards[card2]) {
+      let numberPairsUnassociated = this.cards.length / 2 - this.numberPairsAssociated;
       this.score += GAME_SCORE_FACTOR * numberPairsUnassociated;
-      card.associated = firstFlippedCard.associated = true;
+      return true;
     } else {
-      this.score -= GAME_SCORE_FACTOR * numberPairsAssociated;
+      this.score -= GAME_SCORE_FACTOR * this.numberPairsAssociated;
+      return false;
     }
-    this.firstFlippedCard = null;
-    return [associated, firstFlippedCard];
   }
 }
