@@ -56,8 +56,8 @@ export default class Game {
     this.score = 0;
   }
 
-  flipPair(card1, card2) {
-    if (this.cards[card1] === this.cards[card2]) {
+  flipPair(cardIndex1, cardIndex2) {
+    if (this.cards[cardIndex1] === this.cards[cardIndex2]) {
       ++this.numberPairsAssociated;
       let numberPairsUnassociated = this.cards.length / 2 - this.numberPairsAssociated;
       this.score += GAME_SCORE_FACTOR * numberPairsUnassociated;
