@@ -1,7 +1,7 @@
 <template>
   <div id="app" data-tid="App">
     <intro-page v-if="state === State.INTRO"
-               :moveToGamePage="moveToGamePage"
+                :moveToGamePage="moveToGamePage"
     ></intro-page>
     <game-page v-if="state === State.GAME"
                :moveToResultPage="moveToResultPage"
@@ -14,6 +14,10 @@
 </template>
 
 <style>
+  /* импорт стилей, общих для IntroPage и ResultPage */
+  /* bмпортируется в главный компонент, в целях избежания дублирования кода в скомпилированном css */
+  @import "styles/page-with-image-title-and-button.css";
+
   html, body, #app {
     height: 100%;
   }
@@ -37,57 +41,6 @@
 
   button:active:focus {
     outline: none;
-  }
-
-  /* ======= адаптивное изображение на страницах начала и конца игры ======= */
-
-  .responsive-image {
-    width: 40vw;
-  }
-
-  @media all and (orientation: portrait) {
-    .responsive-image {
-      width: 80vw;
-    }
-  }
-
-  /* ======= заголовок ======= */
-
-  .header {
-    opacity: 0.85;
-    font-weight: bold;
-    color: white;
-  }
-
-  /* ======= белая кнопка с зелёным текстом на зелёном фоне  */
-
-  .button {
-    padding: 10px 20px;
-    /* не используется opacity, так как тогда текст тоже будет прозрачным */
-    /* хотя на него это бы не повлияло бы, так как его цвет совпадает с цветом фона */
-    background: rgba(255, 255, 255, 0.85);
-    border-radius: 4px;
-    border: none;
-
-    font-weight: bold;
-    font-size: 3vmin;
-    color: #1C7430;
-    letter-spacing: 0;
-    transition: transform .1s;
-  }
-
-  .button:hover {
-    cursor: pointer;
-    transform: scale(1.2);
-  }
-
-  .button:active {
-    color: #2196f3;
-  }
-
-  .button:focus {
-    /* я не придумал как переопределить outline, поэтому оставил стандартную рамку */
-    /* outline: none; */
   }
 </style>
 
