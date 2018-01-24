@@ -19,19 +19,6 @@
   </div>
 </template>
 
-<script>
-  export default {
-    name: 'result-page',
-    props: ['score', 'moveToGamePage'],
-    methods: {
-      onButtonRetryGameClick(event) {
-        event.target.blur();
-        this.moveToGamePage();
-      }
-    }
-  };
-</script>
-
 <style scoped>
   .result-page {
     text-align: center;
@@ -45,3 +32,16 @@
     letter-spacing: 0.15px;
   }
 </style>
+
+<script>
+  export default {
+    name: 'result-page',
+    props: ['score', 'moveToGamePage'],
+    methods: {
+      onButtonRetryGameClick(event) {
+        event.target.blur();
+        this.moveToGamePage();
+      }
+    }
+  };
+</script>

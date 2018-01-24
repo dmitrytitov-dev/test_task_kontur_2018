@@ -16,19 +16,6 @@
   </div>
 </template>
 
-<script>
-  export default {
-    name: 'intro-page',
-    props: ['moveToGamePage'],
-    methods: {
-      onButtonNewGameClick(event) {
-        event.target.blur();
-        this.moveToGamePage();
-      }
-    }
-  };
-</script>
-
 <style scoped>
   .intro-page {
     text-align: center;
@@ -42,3 +29,16 @@
     text-transform: uppercase;
   }
 </style>
+
+<script>
+  export default {
+    name: 'intro-page',
+    props: ['moveToGamePage'],
+    methods: {
+      onButtonNewGameClick(event) {
+        event.target.blur();
+        this.moveToGamePage();
+      }
+    }
+  };
+</script>
