@@ -1,20 +1,23 @@
 <template>
   <div class="result-page">
-    <img class="result-page__image responsive-image"
-         src="/static/images/EndGame.png"
-         srcset="/static/images/EndGame.png 508w,
+    <img
+      class="result-page__image responsive-image"
+      src="/static/images/EndGame.png"
+      srcset="/static/images/EndGame.png 508w,
                  /static/images/EndGame@2x.png 1016w"
-         sizes="40vw"
-         alt="картинка из четырёх карт (лицевой стороной)">
+      sizes="40vw"
+      alt="картинка из четырёх карт (лицевой стороной)"
+    >
     <h1 class="result-page__header header">
       Поздравляем!<br>
       Ваш итоговый счёт: {{score}}
     </h1>
     <button
-      @click="onButtonRetryGameClick"
       class="result-page__button-new-game button"
+      @click="onButtonRetryGameClick"
       data-tid="EndGame-retryGame"
-    >Ещё раз
+    >
+      Ещё раз
     </button>
   </div>
 </template>

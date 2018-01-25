@@ -1,6 +1,12 @@
 <template>
   <div class="menu">
-    <button class="menu__button-new-game" data-tid="Menu-newGame" @click="onButtonNewGameClick">Начать заново</button>
+    <button
+      class="menu__button-new-game"
+      data-tid="Menu-newGame"
+      @click="onButtonNewGameClick"
+    >
+      Начать заново
+    </button>
     <span class="menu__scores-title">Очки:</span>
     <span class="menu__scores-value" data-tid="Menu-scores">{{score}}</span>
   </div>

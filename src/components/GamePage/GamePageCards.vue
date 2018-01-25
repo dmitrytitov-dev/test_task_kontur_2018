@@ -1,17 +1,20 @@
 <template>
   <div class="cards" data-tid="Deck">
-    <div v-for="card of cards" :class="['cards__card card', {'card_flipped': card.flipped, 'card_associated': card.associated}]"
-         @click="onCardClick(card)"
-         :data-tid="card.flipped ? 'Card-flipped' : (card.associated ? null : 'Card')"
+    <div
+      v-for="card of cards" :class="['cards__card card', {'card_flipped': card.flipped, 'card_associated': card.associated}]"
+      @click="onCardClick(card)"
+      :data-tid="card.flipped ? 'Card-flipped' : (card.associated ? null : 'Card')"
     >
       <div class="card__inner">
-        <img class="card__frontside"
-             :src="`/static/cards/${card.name}.png`"
-             :alt="card.flipped ? `карта ${card.name}, лицевая сторона` : ''"
+        <img
+          class="card__frontside"
+          :src="`/static/cards/${card.name}.png`"
+          :alt="card.flipped ? `карта ${card.name}, лицевая сторона` : ''"
         >
-        <img class="card__backside"
-             :src="`/static/backside.png`"
-             :alt="card.flipped ? '' : 'рубашка карты'"
+        <img
+          class="card__backside"
+          :src="`/static/backside.png`"
+          :alt="card.flipped ? '' : 'рубашка карты'"
         >
       </div>
     </div>

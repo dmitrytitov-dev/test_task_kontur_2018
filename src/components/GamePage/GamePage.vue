@@ -1,16 +1,19 @@
 <template>
   <div class="game-page" v-if="game">
-    <game-page-menu class="game-page__menu"
-                    ref="menu"
-                    v-bind="{score: scoreDelayed, onButtonNewGameClick}"
+    <game-page-menu
+      class="game-page__menu"
+      ref="menu"
+      v-bind="{score: scoreDelayed, onButtonNewGameClick}"
     ></game-page-menu>
-    <game-page-cards class="game-page__cards"
-                     ref="cards"
-                     v-bind="{cards, onCardClick}"
+    <game-page-cards
+      class="game-page__cards"
+      ref="cards"
+      v-bind="{cards, onCardClick}"
     ></game-page-cards>
-    <game-page-card-disappear-animation v-for="animation of cardDisappearAnimations"
-                                        class="game-page__card-disappear-animation"
-                                        :animation="animation"
+    <game-page-card-disappear-animation
+      v-for="animation of cardDisappearAnimations"
+      class="game-page__card-disappear-animation"
+      :animation="animation"
     ></game-page-card-disappear-animation>
   </div>
 </template>

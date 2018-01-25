@@ -1,14 +1,17 @@
 <template>
   <div id="app" data-tid="App">
-    <intro-page v-if="state === State.INTRO"
-                :moveToGamePage="moveToGamePage"
+    <intro-page
+      v-if="state === State.INTRO"
+      :moveToGamePage="moveToGamePage"
     ></intro-page>
-    <game-page v-if="state === State.GAME"
-               :moveToResultPage="moveToResultPage"
+    <game-page
+      v-if="state === State.GAME"
+      :moveToResultPage="moveToResultPage"
     ></game-page>
-    <result-page v-if="state === State.RESULT"
-                 :score="score"
-                 :moveToGamePage="moveToGamePage"
+    <result-page
+      v-if="state === State.RESULT"
+      :score="score"
+      :moveToGamePage="moveToGamePage"
     ></result-page>
   </div>
 </template>
