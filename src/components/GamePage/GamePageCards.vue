@@ -7,11 +7,11 @@
       <div class="card__inner">
         <img class="card__frontside"
              :src="`/static/cards/${card.name}.png`"
-             alt=""
+             :alt="card.flipped ? `карта ${card.name}, лицевая сторона` : ''"
         >
         <img class="card__backside"
              :src="`/static/backside.png`"
-             alt=""
+             :alt="card.flipped ? '' : 'рубашка карты'"
         >
       </div>
     </div>
@@ -70,7 +70,11 @@
   }
 
   .card.card_associated {
-    visibility: hidden;
+    cursor: default;
+  }
+
+  .card.card_associated > .card__inner {
+    display: none;
   }
 
   /* https://davidwalsh.name/css-flip */
@@ -96,7 +100,7 @@
     left: 0;
     top: 0;
 
-    /* иначе <img> является строчым элементом, с vertical-align: baseline по умолчанию (https://stackoverflow.com/a/34952703/5812238) */
+    /* иначе <img> является строчным элементом, с vertical-align: baseline по умолчанию (https://stackoverflow.com/a/34952703/5812238) */
     display: block;
   }
 
