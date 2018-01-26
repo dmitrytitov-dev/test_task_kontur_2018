@@ -42,7 +42,7 @@
   import Game from './Game.js';
   import GamePageCards from '@/components/GamePage/GamePageCards';
   import GamePageCardDisappearAnimation from '@/components/GamePage/GamePageCardDisappearAnimation';
-  import {GAME_CARDS_FLIP_ANIMATION_DURATION, GAME_DELAY_BETWEEN_CARD_OPEN_AND_DISAPPEAR_START, GAME_DELAY_BETWEEN_CARD_OPEN_AND_FLIP_START, GAME_DELAY_BETWEEN_GAME_START_AND_FLIP_ALL_CARDS} from '@/components/constants';
+  import {GAME_CARDS_FLIP_ANIMATION_DURATION, GAME_DELAY_BEFORE_DISAPPEAR_ANIMATION, GAME_DELAY_BEFORE_FLIP_TO_BACKSIDE, GAME_DELAY_BETWEEN_GAME_START_AND_FLIP_ALL_CARDS} from '@/components/constants';
 
   function sleep(milliseconds) {
     return new Promise(resolve => setTimeout(resolve, milliseconds));
@@ -132,11 +132,11 @@
         this.scoreDelayed += scoreDelta;
       },
       async flipCardPair(card1, card2) {
-        await sleep(GAME_DELAY_BETWEEN_CARD_OPEN_AND_FLIP_START);
+        await sleep(GAME_DELAY_BEFORE_FLIP_TO_BACKSIDE);
         card1.flipped = card2.flipped = false;
       },
       async disappearCardPair(card1, card2) {
-        await sleep(GAME_DELAY_BETWEEN_CARD_OPEN_AND_DISAPPEAR_START);
+        await sleep(GAME_DELAY_BEFORE_DISAPPEAR_ANIMATION);
         card1.associated = card2.associated = true;
         card1.flipped = card2.flipped = false;
         this.disappearCard(card1);
