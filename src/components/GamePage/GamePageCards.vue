@@ -126,7 +126,7 @@
 
   /* индикация выбранной карты для управления с клавиатуры (tab + стрелки + enter) */
   .card__inner:focus {
-    outline: solid 2px deepskyblue;
+    outline: solid 2px #ffeb3b;
   }
 </style>
 
