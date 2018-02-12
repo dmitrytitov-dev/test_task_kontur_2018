@@ -85,7 +85,7 @@
         this.cardDisappearAnimations = [];
 
         await sleep(GAME_DELAY_BETWEEN_GAME_START_AND_FLIP_ALL_CARDS);
-        // проверка на случай, если в течении первых пяти секунд пользователь нажал кнопку начала новой игры
+        // проверка на случай, если в течение первых пяти секунд пользователь нажал кнопку начала новой игры
         if (currentGameId === this.gameId) {
           for (let card of this.cards) {
             card.flipped = false;
@@ -119,9 +119,10 @@
 
         let firstFlippedCard = this.firstFlippedCard;
         this.firstFlippedCard = null;
+        let score = this.game.score;
+        let currentGameId = this.gameId;
 
         await sleep(GAME_CARDS_FLIP_ANIMATION_DURATION);
-        let score = this.game.score;
         let associated = this.game.flipPair(card.index, firstFlippedCard.index);
         let scoreDelta = this.game.score - score;
         if (associated) {
@@ -129,7 +130,10 @@
         } else {
           await this.flipCardPair(card, firstFlippedCard);
         }
-        this.scoreDelayed += scoreDelta;
+        // проверка на случай, если в течение анимации исчезновения пары карт пользователь нажал кнопку начала новой игры
+        if (currentGameId === this.gameId) {
+          this.scoreDelayed += scoreDelta;
+        }
       },
       async flipCardPair(card1, card2) {
         await sleep(GAME_DELAY_BEFORE_FLIP_TO_BACKSIDE);

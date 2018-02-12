@@ -73,7 +73,7 @@
     cursor: pointer;
   }
 
-  .card.card_associated {
+  .card.card_flipped, .card.card_associated {
     cursor: default;
   }
 

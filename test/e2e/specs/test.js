@@ -20,7 +20,7 @@ function assertGamePageIsOpen(client) {
     .assert.attributeEquals('button', 'data-tid', 'Menu-newGame')
   // очки
     .assert.elementCount('span', 2)
-    .assert.containsText('span:nth-of-type(1)', 'Очки')
+    .assert.containsText('span:nth-of-type(1)', 'Очки:')
     .assert.containsText('span:nth-of-type(2)', '0')
     .assert.attributeEquals('span:nth-of-type(2)', 'data-tid', 'Menu-scores');
 }
@@ -29,7 +29,7 @@ function assertResultPageIsOpen(client) {
   client.assert.elementCount('img', 1);
   // заголовок
   client.assert.elementCount('h1', 1);
-  client.expect.element('h1').text.to.match(/Поздравляем!\nВаш итоговый счёт: [-]\d+/);
+  client.expect.element('h1').text.to.match(/Поздравляем!\nВаш итоговый счёт: -?\d+/);
   // кнопка начала новой игры
   client.assert.elementCount('button', 1);
   client.assert.containsText('button', 'Ещё раз');
@@ -89,7 +89,6 @@ module.exports = {
   'game page, restart game test': client => {
     // начнём новую игру
     client.click('[data-tid="Menu-newGame"]');
-    // todo при прибавлении очков проверять нмоер игры
     assertGamePageIsOpen(client);
   },
 
