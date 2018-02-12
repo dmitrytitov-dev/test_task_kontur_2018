@@ -1,7 +1,8 @@
 <template>
   <div class="cards" data-tid="Deck">
     <div
-      v-for="card of cards" :class="['cards__card card', {'card_flipped': card.flipped, 'card_associated': card.associated}]"
+      v-for="card of cards"
+      :class="['cards__card card', {'card_flipped': card.flipped, 'card_associated': card.associated}]"
       @click="onCardClick(card)"
       :data-tid="card.flipped ? 'Card-flipped' : (card.associated ? null : 'Card')"
     >
