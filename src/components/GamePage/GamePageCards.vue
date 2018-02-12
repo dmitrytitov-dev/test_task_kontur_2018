@@ -2,6 +2,7 @@
   <div class="cards" data-tid="Deck">
     <div
       v-for="card of cards"
+      :key="card.index"
       :class="['cards__card card', {'card_flipped': card.flipped, 'card_associated': card.associated}]"
       @click="onCardClick(card)"
       :data-tid="card.flipped ? 'Card-flipped' : (card.associated ? null : 'Card')"

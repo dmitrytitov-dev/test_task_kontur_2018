@@ -19,6 +19,7 @@ describe('ResultPage.vue', () => {
     const button = vm.$el.querySelector('button');
     expect(button.textContent)
       .toEqualIgnoreSpaceCollapsing('Ещё раз');
+    expect(button.dataset.tid).toBe('EndGame-retryGame');
 
     expect(moveToGamePageMocked.mock.calls.length).toBe(0);
     button.click();

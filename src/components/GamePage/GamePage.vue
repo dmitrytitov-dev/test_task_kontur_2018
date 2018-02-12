@@ -12,6 +12,7 @@
     ></game-page-cards>
     <game-page-card-disappear-animation
       v-for="animation of cardDisappearAnimations"
+      :key="animation.card.index"
       class="game-page__card-disappear-animation"
       :animation="animation"
     ></game-page-card-disappear-animation>
@@ -42,7 +43,7 @@
   import Game from './Game.js';
   import GamePageCards from '@/components/GamePage/GamePageCards';
   import GamePageCardDisappearAnimation from '@/components/GamePage/GamePageCardDisappearAnimation';
-  import {GAME_CARDS_FLIP_ANIMATION_DURATION, GAME_DELAY_BEFORE_DISAPPEAR_ANIMATION, GAME_DELAY_BEFORE_FLIP_TO_BACKSIDE, GAME_DELAY_BETWEEN_GAME_START_AND_FLIP_ALL_CARDS} from '@/components/constants';
+  import {GAME_CARDS_FLIP_ANIMATION_DURATION, GAME_DELAY_BEFORE_DISAPPEAR_ANIMATION, GAME_DELAY_BEFORE_FLIP_TO_BACKSIDE, GAME_DELAY_BETWEEN_GAME_START_AND_FLIP_ALL_CARDS, GAME_HEIGHT, GAME_WIDTH} from '@/components/constants';
 
   function sleep(milliseconds) {
     return new Promise(resolve => setTimeout(resolve, milliseconds));
@@ -67,7 +68,6 @@
       };
     },
     mounted() {
-      console.clear();
       this.startNewGame();
       this.$nextTick(() => this.onResize());
       window.addEventListener('resize', this.onResize);
@@ -93,14 +93,15 @@
         }
       },
       onResize() {
+        // алгоритм расчёта и обоснование его выбора описаны в комментариях к css коду в файле GamePageCards.vue
         let windowWidth = document.documentElement.clientWidth;
         let windowHeight = document.documentElement.clientHeight;
         let gridMaxWidth = 0.6 * windowWidth;
         let gridMaxHeight = 0.8 * windowHeight;
         let gridGap = 0.03 * Math.min(windowWidth, windowHeight);
         let cardScale = Math.min(
-          (gridMaxWidth - gridGap * 5) / 6 / 226,
-          (gridMaxHeight - gridGap * 2) / 3 / 314
+          (gridMaxWidth - gridGap * (GAME_WIDTH - 1)) / GAME_WIDTH / 226,
+          (gridMaxHeight - gridGap * (GAME_HEIGHT - 1)) / GAME_HEIGHT / 314
         );
         if (this.$refs.cards) {
           this.$refs.cards.$el.style.setProperty('--card-scale', cardScale);

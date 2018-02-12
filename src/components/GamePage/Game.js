@@ -1,6 +1,6 @@
 import range from 'lodash.range';
 import shuffle from 'lodash.shuffle';
-import {GAME_SCORE_FACTOR} from '@/components/constants';
+import {GAME_HEIGHT, GAME_SCORE_FACTOR, GAME_WIDTH} from '@/components/constants';
 
 function getAllCards() {
   let suits = ['C', 'D', 'H', 'S'];
@@ -18,26 +18,8 @@ function getAllCards() {
 
 const allCards = getAllCards();
 
-function generateRandomCombination(set, combinationSize) {
-  // создаём копию, так как будем изменять множество элементов
-  let array = [...set];
-
-  let combination = [];
-  while (combination.length < combinationSize) {
-    // выбираем случайный элемент массива и добавляем его к сочетанию
-    let randomIndex = Math.floor(Math.random() * array.length);
-    let randomElement = array[randomIndex];
-    combination.push(randomElement);
-
-    // удаляем выбранный элемент из массива
-    array[randomIndex] = array[array.length - 1];
-    array.pop();
-  }
-  return combination;
-}
-
 export default class Game {
-  constructor(height = 3, width = 6) {
+  constructor(height = GAME_HEIGHT, width = GAME_WIDTH) {
     if (height * width % 2 !== 0) {
       throw new Error('Число карт на поле должно быть чётно');
     }
@@ -47,9 +29,9 @@ export default class Game {
       throw new Error('Размер поля слишком большой. Не получится сделать так, чтобы у каждой карты была ровно одна пара');
     }
 
-    let gameCardsUnique = generateRandomCombination(allCards, numberUniqueCards);
+    // случайное сочетания множества allCards размера numberUniqueCards
+      let gameCardsUnique = shuffle(allCards).slice(0, numberUniqueCards);
     this.cards = shuffle([...gameCardsUnique, ...gameCardsUnique]);
-    // this.cards = [allCards[0], ...new Array(gameCardsNames.length - 1).fill(allCards[1])];
     this.height = height;
     this.width = width;
     this.numberPairsAssociated = 0;
