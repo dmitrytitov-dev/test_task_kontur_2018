@@ -19,8 +19,13 @@ describe('Game.js', () => {
       });
 
       it('each card should have exactly one pair', () => {
-        const cardsUnique = [...new Set(cards)];
-        expect(cardsUnique.length).toBe(9);
+        let counts = {};
+        for (let card of cards) {
+          counts[card] = (card in counts ? counts[card] : 0) + 1;
+        }
+        for (let count of Object.values(counts)) {
+          expect(count).toBe(2);
+        }
       });
     });
 
