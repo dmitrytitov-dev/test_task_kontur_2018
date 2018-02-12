@@ -108,7 +108,7 @@
         }
       },
       async onCardClick(card) {
-        if (card.flipped) {
+        if (card.flipped || card.associated) {
           return;
         }
         card.flipped = true;

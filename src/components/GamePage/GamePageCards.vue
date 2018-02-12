@@ -1,13 +1,23 @@
 <template>
-  <div class="cards" data-tid="Deck">
+  <div
+    class="cards"
+    ref="cards"
+    data-tid="Deck"
+  >
     <div
       v-for="card of cards"
       :key="card.index"
       :class="['cards__card card', {'card_flipped': card.flipped, 'card_associated': card.associated}]"
       @click="onCardClick(card)"
+      @keydown.enter="onCardClick(card)"
+      @keydown.esc="blurActiveCard"
+      @keydown.up="moveCardFocus(card, -1, 0)"
+      @keydown.down="moveCardFocus(card, +1, 0)"
+      @keydown.left="moveCardFocus(card, 0, -1)"
+      @keydown.right="moveCardFocus(card, 0, +1)"
       :data-tid="card.flipped ? 'Card-flipped' : (card.associated ? null : 'Card')"
     >
-      <div class="card__inner">
+      <div class="card__inner" tabindex="0">
         <img
           class="card__frontside"
           :src="`/static/cards/${card.name}.png`"
@@ -112,11 +122,48 @@
   .card__frontside {
     transform: rotateY(180deg);
   }
+
+  /* индикация выбранной карты для управления с клавиатуры (tab + стрелки + enter) */
+  .card__inner:focus {
+    outline: solid 2px deepskyblue;
+  }
 </style>
 
 <script>
+  import {GAME_HEIGHT, GAME_WIDTH} from '@/components/constants';
+
   export default {
     name: 'game-page-cards',
-    props: ['cards', 'onCardClick']
+    props: ['cards', 'onCardClick'],
+    mounted() {
+      document.addEventListener('keydown', this.onKeydown);
+    },
+    beforeDestroy() {
+      document.removeEventListener('keydown', this.onKeydown);
+    },
+    methods: {
+      onKeydown(event) {
+        let activeElementExists = document.activeElement && document.activeElement !== document.body;
+        if (!activeElementExists && ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(event.code)) {
+          this.focusCard(0);
+        }
+      },
+      moveCardFocus(card, deltaI, deltaJ) {
+        let i = Math.floor(card.index / GAME_WIDTH);
+        let j = card.index % GAME_WIDTH;
+        let newI = i + deltaI;
+        let newJ = j + deltaJ;
+        if (0 <= newI && newI < GAME_HEIGHT && 0 <= newJ && newJ < GAME_WIDTH) {
+          let newCardIndex = newI * GAME_WIDTH + newJ;
+          this.focusCard(newCardIndex);
+        }
+      },
+      focusCard(index) {
+        this.$refs.cards.children[index].firstElementChild.focus();
+      },
+      blurActiveCard() {
+        document.activeElement.blur();
+      }
+    }
   };
 </script>
