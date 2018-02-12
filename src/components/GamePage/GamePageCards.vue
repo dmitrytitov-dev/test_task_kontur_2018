@@ -8,9 +8,13 @@
       v-for="card of cards"
       :key="card.index"
       :class="['cards__card card', {'card_flipped': card.flipped, 'card_associated': card.associated}]"
-      @click="onCardClickWrapper(card)"
-      @keydown.enter="onCardClickWrapper(card)"
+      @click="onCardClick(card)"
       @keydown.esc="blurActiveCard"
+      @keydown.enter="onCardClick(card)"
+      @keydown.up="moveCardFocus(card, -1, 0)"
+      @keydown.down="moveCardFocus(card, +1, 0)"
+      @keydown.left="moveCardFocus(card, 0, -1)"
+      @keydown.right="moveCardFocus(card, 0, +1)"
       :data-tid="card.flipped ? 'Card-flipped' : (card.associated ? null : 'Card')"
     >
       <!-- tabindex на .card__inner, а не на .card, чтобы рамка поворачивалась вместе с картой -->
@@ -132,11 +136,6 @@
   export default {
     name: 'game-page-cards',
     props: ['cards', 'onCardClick'],
-    data() {
-      return {
-        lastFlippedCardIndex: null
-      };
-    },
     mounted() {
       document.addEventListener('keydown', this.onKeydown);
     },
@@ -145,38 +144,14 @@
     },
     methods: {
       // все методы связаны с управлением с клавиатуры
-      onKeydown(event) {
-        const deltas = {
-          ArrowLeft: [0, -1],
-          ArrowRight: [0, +1],
-          ArrowUp: [-1, 0],
-          ArrowDown: [+1, 0]
-        };
-
-        if (!(event.code in deltas)) {
-          return;
-        }
-        let delta = deltas[event.code];
-
-        if (document.activeElement && document.activeElement.classList.contains('card__inner')) {
-          // одна из карт находится в состоянии :focus
-          let cardInnerElement = document.activeElement;
-          let cardElement = cardInnerElement.parentElement;
-          let cardIndex = [...cardElement.parentElement.children].indexOf(cardElement);
-          this.moveCardFocus(cardIndex, delta);
-        } else if (!document.activeElement || document.activeElement === document.body) {
-          // нет элемента в состоянии :focus
-          if (this.lastFlippedCardIndex) {
-            this.focusCard(this.lastFlippedCardIndex);
-            this.moveCardFocus(this.lastFlippedCardIndex, delta);
-          } else {
-            this.focusCard(0);
-          }
+      onKeydown() {
+        if (!document.activeElement || document.activeElement === document.body) {
+          this.focusCard(0);
         }
       },
-      moveCardFocus(cardIndex, [deltaI, deltaJ]) {
-        let i = Math.floor(cardIndex / GAME_WIDTH);
-        let j = cardIndex % GAME_WIDTH;
+      moveCardFocus(card, deltaI, deltaJ) {
+        let i = Math.floor(card.index / GAME_WIDTH);
+        let j = card.index % GAME_WIDTH;
         let newI = i + deltaI;
         let newJ = j + deltaJ;
         if (0 <= newI && newI < GAME_HEIGHT && 0 <= newJ && newJ < GAME_WIDTH) {
@@ -186,10 +161,6 @@
       },
       focusCard(index) {
         this.$refs.cards.children[index].firstElementChild.focus();
-      },
-      onCardClickWrapper(card) {
-        this.lastFlippedCardIndex = card.index;
-        this.onCardClick(card);
       },
       blurActiveCard() {
         document.activeElement.blur();

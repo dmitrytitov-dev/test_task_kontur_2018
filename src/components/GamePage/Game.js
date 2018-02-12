@@ -30,7 +30,7 @@ export default class Game {
     }
 
     // случайное сочетания множества allCards размера numberUniqueCards
-      let gameCardsUnique = shuffle(allCards).slice(0, numberUniqueCards);
+    let gameCardsUnique = shuffle(allCards).slice(0, numberUniqueCards);
     this.cards = shuffle([...gameCardsUnique, ...gameCardsUnique]);
     this.height = height;
     this.width = width;
