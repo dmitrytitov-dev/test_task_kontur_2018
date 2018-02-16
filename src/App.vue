@@ -39,7 +39,7 @@
 
   @font-face {
     font-family: Krungthep;
-    src: url("/static/fonts/Krungthep1.ttf");
+    src: url("/static/fonts/Krungthep.ttf");
   }
 
   button:active:focus {
