@@ -8,6 +8,7 @@
       v-for="card of cards"
       :key="card.index"
       :class="['cards__card card', {'card_flipped': card.flipped, 'card_associated': card.associated}]"
+      @mousedown="onMousedown"
       @click="onCardClick(card)"
       @keydown.esc="blurActiveCard"
       @keydown.enter="onCardClick(card)"
@@ -143,7 +144,11 @@
       document.removeEventListener('keydown', this.onKeydown);
     },
     methods: {
-      // все методы связаны с управлением с клавиатуры
+      onMousedown(event) {
+        // чтобы карточка не получала фокуса (он используется и меняется путём управления с клавиатуры)
+        event.preventDefault();
+      },
+      // все оставшиеся методы связаны с управлением с клавиатуры
       onKeydown(event) {
         if (!document.activeElement || document.activeElement === document.body
           && event.key.startsWith('Arrow') /* ArrowLeft, ArrowDown and so on */) {
