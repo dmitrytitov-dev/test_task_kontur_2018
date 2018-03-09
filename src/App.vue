@@ -13,6 +13,9 @@
       :score="score"
       :moveToGamePage="moveToGamePage"
     ></result-page>
+
+    <!-- невидимый элемент для предзагрузки картинок и шрифтов -->
+    <placeholder-for-preloading-images-and-font></placeholder-for-preloading-images-and-font>
   </div>
 </template>
 
@@ -51,6 +54,7 @@
   import IntroPage from '@/components/IntroPage';
   import GamePage from '@/components/GamePage/GamePage';
   import ResultPage from '@/components/ResultPage';
+  import PlaceholderForPreloadingImagesAndFont from '@/components/PlaceholderForPreloadingImagesAndFont';
 
   // enum с элементами, соответствующими экранам
   const State = Object.freeze({
@@ -61,7 +65,12 @@
 
   export default {
     name: 'App',
-    components: {ResultPage, GamePage, IntroPage},
+    components: {
+      PlaceholderForPreloadingImagesAndFont,
+      ResultPage,
+      GamePage,
+      IntroPage
+    },
     data() {
       return {
         state: State.INTRO,

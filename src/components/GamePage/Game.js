@@ -16,7 +16,7 @@ function getAllCards() {
   return cards;
 }
 
-const allCards = getAllCards();
+export const allCards = getAllCards();
 
 export default class Game {
   constructor(height = GAME_HEIGHT, width = GAME_WIDTH) {
