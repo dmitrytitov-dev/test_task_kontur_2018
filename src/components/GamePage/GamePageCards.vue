@@ -144,8 +144,9 @@
     },
     methods: {
       // все методы связаны с управлением с клавиатуры
-      onKeydown() {
-        if (!document.activeElement || document.activeElement === document.body) {
+      onKeydown(event) {
+        if (!document.activeElement || document.activeElement === document.body
+          && event.key.startsWith('Arrow') /* ArrowLeft, ArrowDown and so on */) {
           this.focusCard(0);
         }
       },
