@@ -2,10 +2,10 @@
   <div class="intro-page">
     <img
       class="intro-page__image responsive-image"
-      srcset="/static/images/StartGame.png 501w,
-              /static/images/StartGame@2x.png 1002w"
+      srcset="static/images/StartGame.png 501w,
+              static/images/StartGame@2x.png 1002w"
       sizes="40vw"
-      src="/static/images/StartGame.png"
+      src="static/images/StartGame.png"
       alt="картинка из четырёх карт, три из которых показаны рубашкой"
     >
     <h1 class="intro-page__header header">Memory game</h1>

@@ -2,9 +2,9 @@
   <div class="result-page">
     <img
       class="result-page__image responsive-image"
-      src="/static/images/EndGame.png"
-      srcset="/static/images/EndGame.png 508w,
-                 /static/images/EndGame@2x.png 1016w"
+      src="static/images/EndGame.png"
+      srcset="static/images/EndGame.png 508w,
+              static/images/EndGame@2x.png 1016w"
       sizes="40vw"
       alt="картинка из четырёх карт (лицевой стороной)"
     >

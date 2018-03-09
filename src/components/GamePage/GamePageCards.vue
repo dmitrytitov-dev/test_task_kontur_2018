@@ -21,12 +21,12 @@
       <div class="card__inner" tabindex="0">
         <img
           class="card__frontside"
-          :src="`/static/cards/${card.name}.png`"
+          :src="`static/cards/${card.name}.png`"
           :alt="card.flipped ? `карта ${card.name}, лицевая сторона` : ''"
         >
         <img
           class="card__backside"
-          :src="`/static/backside.png`"
+          src="static/backside.png"
           :alt="card.flipped ? '' : 'рубашка карты'"
         >
       </div>

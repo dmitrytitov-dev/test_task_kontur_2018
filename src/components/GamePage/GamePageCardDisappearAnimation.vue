@@ -3,7 +3,7 @@
     <img
       class="animation__image"
       :style="{height: animation.height + 'px', width: animation.width + 'px'}"
-      :src="`/static/cards/${animation.card.name}.png`"
+      :src="`static/cards/${animation.card.name}.png`"
       :alt="`карта ${animation.card.name}, с анимацией исчезновения`"
       ref="image"
     >
