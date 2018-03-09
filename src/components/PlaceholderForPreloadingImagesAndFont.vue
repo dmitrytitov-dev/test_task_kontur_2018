@@ -26,6 +26,9 @@
 <style scoped>
   .placeholder {
     position: absolute;
+    height: 0;
+    width: 0;
+    overflow: hidden;
     visibility: hidden;
   }
 
