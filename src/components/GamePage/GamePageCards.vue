@@ -26,7 +26,7 @@
         >
         <img
           class="card__backside"
-          src="static/backside.png"
+          src="static/cards/backside.png"
           :alt="card.flipped ? '' : 'рубашка карты'"
         >
       </div>
