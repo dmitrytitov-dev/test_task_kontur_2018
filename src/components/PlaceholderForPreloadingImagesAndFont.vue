@@ -10,8 +10,10 @@
     <!-- картинки карт -->
     <img
       v-for="card of allCards"
-      :src="`static/cards/${card}.png`">
-    <img src="static/backside.png">
+      :src="`static/cards/${card}.png`"
+      class="placeholder__image"
+    >
+    <img src="static/backside.png" class="placeholder__image">
 
     <!-- картинка для экрана с результатами -->
     <img
@@ -19,6 +21,7 @@
       srcset="static/images/EndGame.png 508w,
               static/images/EndGame@2x.png 1016w"
       sizes="40vw"
+      class="placeholder__image"
     >
   </div>
 </template>

@@ -1,6 +1,7 @@
 function assertIntroPageIsOpen(client) {
   client
-    .assert.elementCount('img', 1)
+  // .placeholder__image --- невидимые изображения, используются для предзагрузки картинок
+    .assert.elementCount('img:not(.placeholder__image)', 1)
   // заголовок
     .assert.elementCount('h1', 1)
     .assert.containsText('h1', 'MEMORY GAME')
@@ -12,7 +13,7 @@ function assertIntroPageIsOpen(client) {
 
 function assertGamePageIsOpen(client) {
   client
-    .assert.elementCount('img', 18 * 2 /* лицевая сторона + рубашка */)
+    .assert.elementCount('img:not(.placeholder__image)', 18 * 2 /* лицевая сторона + рубашка */)
     .assert.elementCount('[data-tid="Card-flipped"]', 18 /* изначально все карты перевёрнуты */)
   // кнопка перезапуска игры
     .assert.elementCount('button', 1)
@@ -26,7 +27,7 @@ function assertGamePageIsOpen(client) {
 }
 
 function assertResultPageIsOpen(client) {
-  client.assert.elementCount('img', 1);
+  client.assert.elementCount('img:not(.placeholder__image)', 1);
   // заголовок
   client.assert.elementCount('h1', 1);
   client.expect.element('h1').text.to.match(/Поздравляем!\nВаш итоговый счёт: -?\d+/);
