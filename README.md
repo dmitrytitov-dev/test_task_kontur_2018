@@ -2,29 +2,32 @@
 
 > Тестовое задание на стажировку 2018 для направления front-end разработки в СКБ Контур
 
-## Build Setup
+# Запуск проекта
 
-``` bash
-# install dependencies
-npm install
+Для просмотра страницы игры нужно открыть файл `/dist/index.html`
 
-# serve with hot reload at localhost:8080
-npm run dev
+**Также доступна веб-версия по адресу https://dmitrytitov-dev.github.io/test_task_kontur_2018/**
 
-# build for production with minification
-npm run build
+# Структура проекта
 
-# build for production and view the bundle analyzer report
-npm run build --report
+Задание сделано с использованием фреймворка [Vue.js](https://vuejs.org/), основываясь на [webpack-шаблоне](https://github.com/vuejs-templates/webpack). Краткое описание папок:
 
-# run unit tests
-npm run unit
+* `/src` — основной код проекта.
+* `/build` и `/config` файлы для конфигурации webpack (сборка & локальный сервер разработки). Эти папки были взяты из webpack-шаблона и практически не менялись.
+* `/static` — статические ресурсы (изображения карт, шрифты)
+* `/test` — тесты
 
-# run e2e tests
-npm run e2e
+# Описание
 
-# run all tests
-npm test
-```
+Я старался как можно точнее соответствовать макету. Вот некоторые вещи, которые использовались для этого:
 
-For a detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
+* Адаптивность: все размеры указаны в относительных единицах — viewport-percentage lengths (размеры шрифтов тоже)
+* Достаточно интересный способ расчёта размеров карты (подробно описан в блоке `<style>` компонента `/src/components/GamePage/GamePageCards.vue`)
+* Достаточно интересный способ получения шрифта Krungthep, (используется в макете), подробнее в `/extract-characterss-subset-from-ttf-file/README.md`
+
+# Разное
+
+* Для разнообразия также было написано управление с клавиатуры (стрелки для выбора карты, Enter для переворота)
+* Были написаны unit и e2e тесты с использованием библиотек Jest и Nightwatch (находятся в папке tests)
+
+P.S. алгоритм подсчёта очков можно было бы улучшить :) так как сейчас можно в начале игры посмотреть все карты и записать на бумажку (специально не делая парочки), а потом открывать каждую парочку с первого раза
