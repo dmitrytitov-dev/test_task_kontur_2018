@@ -13,7 +13,7 @@
       :src="`static/cards/${card}.png`"
       class="placeholder__image"
     >
-    <img src="static/backside.png" class="placeholder__image">
+    <img src="static/cards/backside.png" class="placeholder__image">
 
     <!-- картинка для экрана с результатами -->
     <img
