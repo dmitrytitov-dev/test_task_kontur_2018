@@ -39,7 +39,7 @@ function assertResultPageIsOpen(client) {
 
 module.exports = {
   'intro page test': client => {
-    client.url(client.globals.devServerURL);
+    client.url(process.env.VUE_DEV_SERVER_URL);
     client.waitForElementVisible('#app', 5000);
     client.assert.attributeEquals('#app', 'data-tid', 'App');
     assertIntroPageIsOpen(client);
